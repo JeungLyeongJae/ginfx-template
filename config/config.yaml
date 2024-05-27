@@ -4,11 +4,11 @@ server:
 jwt:
   realm: demo
 database:
-  host: 192.168.71.200
-  port: 30306
-  dbname: demo
+  host: 127.0.0.1
+  port: 3306
+  dbname: ginfx-template
   username: root
-  password: mb123456
+  password: admin999
 redis:
   addr: localhost:6379
   DB: 0

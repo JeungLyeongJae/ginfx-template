@@ -68,26 +68,26 @@ func ProvideGormEngine(appConfig *AppConfig) *gorm.DB {
 	return db
 }
 
-func ProvideRedisClient(config *AppConfig) redis.UniversalClient {
+func ProvideRedisClient(appConfig *AppConfig) redis.UniversalClient {
 	var rdb redis.UniversalClient
 
-	switch config.RedisConfig.Addr {
+	switch appConfig.RedisConfig.Addr {
 	case "cluster":
 		rdb = redis.NewClusterClient(&redis.ClusterOptions{
-			Addrs:    []string{config.RedisConfig.Addr},
-			Password: config.RedisConfig.Password,
+			Addrs:    []string{appConfig.RedisConfig.Addr},
+			Password: appConfig.RedisConfig.Password,
 		})
 	case "sentinel":
 		rdb = redis.NewFailoverClient(&redis.FailoverOptions{
-			MasterName:    config.RedisConfig.MasterName,
-			SentinelAddrs: []string{config.RedisConfig.Addr},
-			Password:      config.RedisConfig.Password,
+			MasterName:    appConfig.RedisConfig.MasterName,
+			SentinelAddrs: []string{appConfig.RedisConfig.Addr},
+			Password:      appConfig.RedisConfig.Password,
 		})
 	default:
 		rdb = redis.NewClient(&redis.Options{
-			Addr:     config.RedisConfig.Addr,
-			Password: config.RedisConfig.Password,
-			DB:       config.RedisConfig.DB,
+			Addr:     appConfig.RedisConfig.Addr,
+			Password: appConfig.RedisConfig.Password,
+			DB:       appConfig.RedisConfig.DB,
 		})
 	}
 

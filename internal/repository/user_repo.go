@@ -26,8 +26,7 @@ func (u *UserRepo) FindByName(name string) (*model.User, error) {
 }
 
 func (u *UserRepo) Save(user *model.User) error {
-	//TODO implement me
-	panic("implement me")
+	return u.db.Create(user).Error
 }
 
 func (u *UserRepo) Delete(user *model.User) error {

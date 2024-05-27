@@ -29,7 +29,7 @@ type DbConfig struct {
 	Host     string `mapstructure:"host"`
 	Port     int64  `mapstructure:"port"`
 	Dbname   string `mapstructure:"dbname"`
-	Sslmode  string `mapstructure:"sslmode"`
+	SslMode  string `mapstructure:"sslmode"`
 	Username string `mapstructure:"username"`
 	Password string `mapstructure:"password"`
 }
@@ -59,7 +59,7 @@ func ProvideAppConfig() *AppConfig {
 		logger.Fatalf("fatal error config file: %v", err)
 	}
 	viper.AutomaticEnv()
-	slog.Info("Locad config file: " + viper.ConfigFileUsed())
+	slog.Info("Load config file: " + viper.ConfigFileUsed())
 	config := &AppConfig{}
 	if err = viper.Unmarshal(config); err != nil {
 		logger.Fatal(err)
