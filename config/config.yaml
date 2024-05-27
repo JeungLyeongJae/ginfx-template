@@ -1,0 +1,14 @@
+server:
+  mode: prod
+  port: 9060
+jwt:
+  realm: demo
+database:
+  host: 192.168.71.200
+  port: 30306
+  dbname: demo
+  username: root
+  password: mb123456
+redis:
+  addr: localhost:6379
+  DB: 0
