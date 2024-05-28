@@ -1,3 +1,6 @@
+all: set-arch build
+
+# ------------------------ golang --------------------------
 # golang's order
 GO_CMD=go
 GO_SET=set
@@ -10,8 +13,6 @@ GO_ARCH=amd64
 BINARY_NAME=ginfx-templete
 BINARY_VERSION=_v1.0
 OS := $(shell $(GO_CMD) env GOOS)
-
-all: set-arch build
 
 set-arch:
 	$(GO_SET) GOARCH=$(GO_ARCH)
@@ -37,6 +38,11 @@ clean:
 	rm -f $(BINARY_NAME)$(BINARY_VERSION).exe
 	rm -f $(BINARY_NAME)$(BINARY_VERSION)
 
+
+# ------------------------ angular --------------------------
+frontend:
+	cd ui && yarn run build
+
 # ensures that these targets do not conflict with real file names and guarantees that they are always executed,
 # regardless of the existence of files with the same name
-.PHONY: all set-arch build clean test
+.PHONY: *

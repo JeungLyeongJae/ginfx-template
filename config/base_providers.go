@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"ginfx-template/pkg/fx/ginfx"
 	"ginfx-template/pkg/logger"
+	"ginfx-template/pkg/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/fx"
@@ -23,6 +24,7 @@ func ProvideWeb(lc fx.Lifecycle, handlers ginfx.Handlers, appConfig *AppConfig) 
 	}
 	app := gin.New()
 	app.Use(gin.Recovery())
+	app.Use(middlewares.ServeRoot("/", "dist"))
 	app.NoRoute(func(context *gin.Context) {
 		if context.Request.RequestURI != "/" {
 			context.Redirect(http.StatusTemporaryRedirect, "/")
