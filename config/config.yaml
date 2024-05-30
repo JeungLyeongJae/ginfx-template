@@ -1,5 +1,5 @@
 server:
-  mode: prod
+  mode: debug
   port: 9060
 jwt:
   realm: demo

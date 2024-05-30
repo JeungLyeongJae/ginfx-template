@@ -1,0 +1,33 @@
+basePath: /
+host: localhost:9060
+info:
+  contact:
+    name: go-swagger帮助文档
+    url: https://github.com/swaggo/swag/blob/master/README_zh-CN.md
+  description: 演示说明文档
+  title: GinFx-Template
+  version: 1.0.0
+paths:
+  /api/user/add:
+    post:
+      parameters:
+      - description: User信息
+        in: query
+        name: user
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: 新增用户
+      tags:
+      - 用户管理
+swagger: "2.0"

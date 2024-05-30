@@ -22,6 +22,9 @@ func ProvideWeb(lc fx.Lifecycle, handlers ginfx.Handlers, appConfig *AppConfig) 
 	if strings.ToLower(appConfig.ServerConfig.Mode) == "prod" {
 		gin.SetMode(gin.ReleaseMode)
 	}
+	if strings.ToLower(appConfig.ServerConfig.Mode) == "debug" {
+		gin.SetMode(gin.DebugMode)
+	}
 	app := gin.New()
 	app.Use(gin.Recovery())
 	app.Use(middlewares.ServeRoot("/", "dist"))

@@ -31,9 +31,7 @@ func runServer(_ *cli.Context) error {
 			config.ProvideWeb,
 		),
 		fx.Options(auth.Module),
-		fx.Options(
-			internal.Module,
-		),
+		fx.Options(internal.Module),
 		fx.Invoke(func(*gin.Engine) {}),
 	).Run()
 	return nil

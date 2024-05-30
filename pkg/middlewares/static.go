@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"embed"
-	"ginfx-template/ui"
+	//"ginfx-template/ui"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"path"
@@ -60,7 +60,8 @@ func (em *EmbedFileSystem) Exists(prefix string, filepath string) bool {
 }
 
 func ServeRoot(urlPrefix, root string) gin.HandlerFunc {
-	return Serve(urlPrefix, EmbedFile(root, &ui.RESOURCE, false))
+	//return Serve(urlPrefix, EmbedFile(root, &ui.RESOURCE, false))
+	return nil
 }
 
 // Serve Static returns a middleware handler that serves static files in the given directory.
