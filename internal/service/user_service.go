@@ -7,7 +7,7 @@ import (
 
 type IUserService interface {
 	Save(user *model.User) error
-	FindByUsername(username string) (model.User, error)
+	FindByUsername(username string) (*model.User, error)
 }
 
 type UserService struct {
@@ -24,7 +24,6 @@ func (u *UserService) Save(user *model.User) error {
 	return u.userRepo.Save(user)
 }
 
-func (u *UserService) FindByUsername(username string) (model.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u *UserService) FindByUsername(username string) (*model.User, error) {
+	return u.userRepo.FindByUsername(username)
 }

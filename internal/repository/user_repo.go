@@ -6,7 +6,7 @@ import (
 )
 
 type IUserRepo interface {
-	FindByName(name string) (*model.User, error)
+	FindByUsername(name string) (*model.User, error)
 	Save(*model.User) error
 	Delete(*model.User) error
 	Update(*model.User) error
@@ -20,9 +20,12 @@ func NewUserRepo(db *gorm.DB) IUserRepo {
 	return &UserRepo{db: db}
 }
 
-func (u *UserRepo) FindByName(name string) (*model.User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u *UserRepo) FindByUsername(name string) (*model.User, error) {
+	user := &model.User{}
+	if err := u.db.First(user, "username = ?", name).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 func (u *UserRepo) Save(user *model.User) error {

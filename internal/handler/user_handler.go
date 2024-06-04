@@ -40,7 +40,7 @@ func (u *UserHandler) hello() ginfx.Route {
 // @Description
 // @Tags         用户管理
 // @Produce      json
-// @Param        user  query     string  true  "User信息"
+// @Param        user  body  model.User  true  "User信息"
 // @Success      200  {object}  string "ok"
 // @Failure      400  {object}  string 报错信息
 // @Router       /api/user/add [post]

@@ -1,12 +1,10 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"time"
 )
 
 type User struct {
-	gorm.Model
 	Id            int64      `json:"id" gorm:"primary_key; column:id; comment:用户ID"`
 	Name          string     `json:"name" gorm:"column:name; type:varchar(255); comment:名字"`
 	Phone         string     `json:"phone" gorm:"column:phone; type:varchar(255); comment:手机号"`
