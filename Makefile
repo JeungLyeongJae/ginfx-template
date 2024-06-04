@@ -4,6 +4,7 @@ all: set-arch build
 # golang's order
 GO_CMD=go
 GO_SET=set
+GO_LINT=$(GO_CMD)lint
 GO_BUILD=$(GO_CMD) build
 GO_CLEAN=$(GO_CMD) clean
 GO_TEST=$(GO_CMD) test
@@ -29,8 +30,20 @@ build:
 	$(GO_BUILD) -o $(BINARY_NAME)$(BINARY_VERSION) -v -x
 endif
 
+# 注释风格：导出的函数和类型应该有适当的注释。
+# 命名规范：变量、函数、类型等的命名应该符合 Go 的命名惯例。
+lint:
+	$(GO_LINT) ./...
+
+# Printf 格式检查：检查 Printf、Sprintf 等函数的格式化字符串与参数类型是否匹配。
+# 结构标签：检查结构体字段标签的格式是否正确。
+# 无效的操作：例如，对 nil 指针进行操作。
+# 导入路径：检查导入路径是否正确。
+vet:
+	$(GO_CMD) vet ./...
+
 test:
-	go test -covermode=count -coverpkg=./... -coverprofile=coverage.out
+	$(GO_CMD) test -covermode=count -coverpkg=./... -coverprofile=coverage.out
 
 
 clean:
