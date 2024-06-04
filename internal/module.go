@@ -20,8 +20,6 @@ var Module = fx.Module("App",
 	),
 	fx.Options(
 		fx.Provide(ginfx.AsHandler(handler.NewUserHandler)),
-	),
-	fx.Options(
 		fx.Provide(ginfx.AsHandler(handler.NewSwaggerHandler)),
 	),
 	fx.Invoke(AutoMigration),

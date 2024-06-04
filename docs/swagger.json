@@ -1,50 +1,108 @@
 {
-  "swagger": "2.0",
-  "info": {
-    "description": "演示说明文档",
-    "title": "GinFx-Template",
-    "contact": {
-      "name": "go-swagger帮助文档",
-      "url": "https://github.com/swaggo/swag/blob/master/README_zh-CN.md"
+    "swagger": "2.0",
+    "info": {
+        "description": "演示说明文档",
+        "title": "GinFx-Template",
+        "contact": {
+            "name": "go-swagger帮助文档",
+            "url": "https://github.com/swaggo/swag/blob/master/README_zh-CN.md",
+            "email": "support@swagger.io"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
     },
-    "version": "1.0.0"
-  },
-  "host": "localhost:9060",
-  "basePath": "/",
-  "paths": {
-    "/api/user/add": {
-      "post": {
-        "produces": [
-          "application/json"
-        ],
-        "tags": [
-          "用户管理"
-        ],
-        "summary": "新增用户",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "User信息",
-            "name": "user",
-            "in": "query",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "ok",
-            "schema": {
-              "type": "string"
+    "host": "localhost:9060",
+    "basePath": "/api/v1",
+    "paths": {
+        "/api/user/add": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "新增用户",
+                "parameters": [
+                    {
+                        "description": "User信息",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "type": "string"
-            }
-          }
         }
-      }
+    },
+    "definitions": {
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_login": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "plain_password": {
+                    "type": "string"
+                },
+                "roles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
     }
-  }
 }

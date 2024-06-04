@@ -1,10 +1,44 @@
-basePath: /
+basePath: /api/v1
+definitions:
+  model.User:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      enable:
+        type: boolean
+      id:
+        type: integer
+      last_login:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      plain_password:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:9060
 info:
   contact:
+    email: support@swagger.io
     name: go-swagger帮助文档
     url: https://github.com/swaggo/swag/blob/master/README_zh-CN.md
   description: 演示说明文档
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
   title: GinFx-Template
   version: 1.0.0
 paths:
@@ -12,10 +46,11 @@ paths:
     post:
       parameters:
       - description: User信息
-        in: query
+        in: body
         name: user
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/model.User'
       produces:
       - application/json
       responses:
@@ -30,4 +65,7 @@ paths:
       summary: 新增用户
       tags:
       - 用户管理
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"
