@@ -1,0 +1,25 @@
+{
+  "name": "ui_vue",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "ant-design-vue": "^4.2.2",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/runtime-core": "^3.4.27",
+    "typescript": "^5.4.5",
+    "unplugin-vue-components": "^0.27.0",
+    "vite": "^5.2.0",
+    "vue-tsc": "^2.0.6"
+  }
+}
