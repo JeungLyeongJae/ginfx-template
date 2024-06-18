@@ -11,7 +11,6 @@ import {
   TeamOutlined,
   UserOutlined
 } from '@ant-design/icons-vue';
-
 const collapsed = ref<boolean>(false);
 const selectedKeys = ref<string[]>(['1']);
 const checked = ref<boolean>(false);
@@ -30,9 +29,6 @@ export default defineComponent({
     FileOutlined,
   },
   computed: {
-    theme() {
-      return theme
-    },
   },
 
   setup() {
@@ -42,13 +38,19 @@ export default defineComponent({
     const toggleTheme = () => {
       usingTheme.value.length == 1 ? usingTheme.value.push(theme.compactAlgorithm) : usingTheme.value.pop()
     };
+
+    function selectElement(info: any) {
+      console.log(info);
+    }
+
     return {
       collapsed,
       selectedKeys,
       usingTheme,
       checked,
       toggleColorTheme,
-      toggleTheme
+      toggleTheme,
+      selectElement
     };
   }
 })
@@ -63,6 +65,10 @@ export default defineComponent({
 <!--      :style="{ position: 'fixed', zIndex: 1, width: '100%' }"  固定页头-->
       <a-layout-header>
         <div class="logo"/>
+        <div :style="{ padding: '5px',  minHeight: '160px', textAlign: 'right' }">
+          <a-button type="primary" @click="toggleColorTheme()">浅/深色模式</a-button>
+          大/小模式：<a-switch v-model:checked="checked" @click="toggleTheme()"/>
+        </div>
       </a-layout-header>
       <a-layout style="min-height: 100vh">
         <a-layout-sider v-model:collapsed="collapsed" width="200" collapsible>
@@ -107,14 +113,9 @@ export default defineComponent({
             <a-breadcrumb-item>User</a-breadcrumb-item>
             <a-breadcrumb-item>Bill</a-breadcrumb-item>
           </a-breadcrumb>
-          <a-layout-content style="margin: 0 16px">
-
-            <div :style="{ padding: '24px',  minHeight: '360px' }">
-              <a-button type="primary" @click="toggleColorTheme()">浅/深色模式</a-button>
-              <br/>
-              <br/>
-              大/小模式：
-              <a-switch v-model:checked="checked" @click="toggleTheme()"/>
+          <a-layout-content style="margin: 0 16px; ">
+            <div class="box" id="bpmn">
+                <Bpmn-Vue :bpmnID="'test'" ref="bpmnRef" @select:element="selectElement" />
             </div>
           </a-layout-content>
           <a-layout-footer style="text-align: center">
@@ -133,5 +134,10 @@ export default defineComponent({
   height: 31px;
   margin: 16px 24px 16px 0;
   background: rgba(255, 255, 255, 0.3);
+}
+
+.box {
+  height: 95%;
+  width: 95%;
 }
 </style>
