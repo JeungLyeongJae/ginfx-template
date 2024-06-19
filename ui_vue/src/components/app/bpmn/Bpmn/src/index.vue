@@ -1,33 +1,26 @@
-<!--
- * @Author: yjl
- * @Date: 2023-09-27 16:24:48
- * @LastEditors: yjl
- * @Description: 描述
--->
 <template>
-  <a-card style="height: 100%">
-  <div class="bpmn-page">
-    <div :id="bpmnID" class="modeler-container"></div>
+  <a-card :body-style="{height: '94%'}">
+    <div class="bpmn-page">
+      <div :id="bpmnID" class="modeler-container"></div>
 
-    <div class="bpmn-operation">
-      <div
-        :title="item.label"
-        @click="item.action"
-        v-for="item in state.operation"
-      >
-        <svg class="icon" aria-hidden="true">
-          <use :xlink:href="item.icon" />
-        </svg>
+      <div class="bpmn-operation">
+        <div
+            :title="item.label"
+            @click="item.action"
+            v-for="item in state.operation"
+        >
+          <svg class="icon" aria-hidden="true">
+            <use :xlink:href="item.icon"/>
+          </svg>
+        </div>
       </div>
     </div>
-  </div>
   </a-card>
 </template>
 
 <script lang="ts" setup>
-import { reactive, onMounted, watch, onBeforeUnmount } from "vue";
+import {onBeforeUnmount, onMounted, reactive, watch} from "vue";
 import translate from "./i18n";
-// import activitiModdel from './activiti-moddel.json'
 import createDefaultBpmnXml from "./defaultBpmnXml";
 import "bpmn-js/dist/assets/diagram-js.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
@@ -35,9 +28,9 @@ import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
 import paletteProvider from "./bpnm-utils/palette-provider.js";
 import CustomContextPadProvider from "./bpnm-utils/custom-context-pad-provider.js";
-import { BPMN } from "./bpmn";
+import {BPMN} from "./bpmn";
 // camunda描述json
-import camundaModdleDescriptor from "camunda-bpmn-moddle/resources/camunda";
+import camundaModuleDescriptor from "camunda-bpmn-moddle/resources/camunda";
 
 interface Props {
   bpmnID: string | undefined;
@@ -45,6 +38,7 @@ interface Props {
   options: any;
   operation: any;
 }
+
 let props = withDefaults(defineProps<Props>(), {
   bpmnID: "modeler-container",
   isReadOnly: false,
@@ -54,11 +48,11 @@ let props = withDefaults(defineProps<Props>(), {
 const defaultProcessIdAndName = "1";
 let emits = defineEmits(["select:element", "data:change"]);
 const bpmnStore = reactive(
-  new BPMN({
-    dataChange: (_oldVal: any, newVal: any) => {
-      emits("data:change", { businessObject: newVal });
-    },
-  })
+    new BPMN({
+      dataChange: (_oldVal: any, newVal: any) => {
+        emits("data:change", {businessObject: newVal});
+      },
+    })
 );
 
 const state = reactive({
@@ -125,8 +119,8 @@ onMounted(() => {
           move: ["value", ""], //禁用单个图形拖动
         },
       ],
-      moddleExtensions: {
-        camunda: camundaModdleDescriptor,
+      moduleExtensions: {
+        camunda: camundaModuleDescriptor,
       },
       ...props.options,
     });
@@ -135,7 +129,7 @@ onMounted(() => {
       container: `#${props.bpmnID}`,
       additionalModules: [
         //添加翻译
-        { translate: ["value", translate("zh")] },
+        {translate: ["value", translate("zh")]},
         // customPalette,
         paletteProvider,
         CustomContextPadProvider,
@@ -144,44 +138,44 @@ onMounted(() => {
       ],
       moddleExtensions: {
         // activiti: activitiModdel,
-        camunda: camundaModdleDescriptor,
+        camunda: camundaModuleDescriptor,
       },
       ...props.options,
     });
   }
   bpmnStore
-    .importXML(
-      createDefaultBpmnXml(defaultProcessIdAndName, defaultProcessIdAndName)
-    )
-    .then((result: Array<string>) => {
-      if (result.length) {
-        console.warn("importSuccess warnings", result);
-      }
-    })
-    .catch((err: any) => {
-      console.warn("importFail errors ", err);
-    });
+      .importXML(
+          createDefaultBpmnXml(defaultProcessIdAndName, defaultProcessIdAndName)
+      )
+      .then((result: Array<string>) => {
+        if (result.length) {
+          console.warn("importSuccess warnings", result);
+        }
+      })
+      .catch((err: any) => {
+        console.warn("importFail errors ", err);
+      });
   if (props.operation.length) {
     state.operation = props.operation;
   }
 });
 watch(
-  () => bpmnStore.activeElementID,
-  (_newVal) => {
-    if (!bpmnStore.getShapeById(bpmnStore.activeElementID)) {
-      bpmnStore.setActiveElement(undefined);
-      bpmnStore.setType(undefined);
-      return;
+    () => bpmnStore.activeElementID,
+    (_newVal) => {
+      if (!bpmnStore.getShapeById(bpmnStore.activeElementID)) {
+        bpmnStore.setActiveElement(undefined);
+        bpmnStore.setType(undefined);
+        return;
+      }
+      let businessObject = bpmnStore.getBusinessObject() || undefined;
+      emits("select:element", {
+        businessObject,
+        shapeType: bpmnStore.getShapeType(),
+      });
+    },
+    {
+      deep: true,
     }
-    let businessObject = bpmnStore.getBusinessObject() || undefined;
-    emits("select:element", {
-      businessObject,
-      shapeType: bpmnStore.getShapeType(),
-    });
-  },
-  {
-    deep: true,
-  }
 );
 
 onBeforeUnmount(() => {
@@ -213,8 +207,13 @@ defineExpose({
 </script>
 
 <style scoped lang="less">
+.ant-card-bordered {
+  height: 100% !important;
+}
+
 .bpmn-page {
   width: 100%;
+  height: 100%;
 }
 
 .bjs-powered-by {
@@ -229,8 +228,7 @@ defineExpose({
   position: relative;
   flex: 1;
   height: 100%;
-  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+")
-    repeat !important;
+  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTTAgMTBoNDBNMTAgMHY0ME0wIDIwaDQwTTIwIDB2NDBNMCAzMGg0ME0zMCAwdjQwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlMGUwZTAiIG9wYWNpdHk9Ii4yIi8+PHBhdGggZD0iTTQwIDBIMHY0MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZTBlMGUwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+") repeat !important;
 }
 
 .djs-palette {
@@ -241,7 +239,16 @@ defineExpose({
 }
 
 :deep(.djs-palette.two-column.open) {
-  width: 47px !important;
+  width: 78px !important;
+}
+
+:deep(.bjs-powered-by) {
+  content-visibility: hidden;
+}
+
+:deep(.djs-palette .entry) {
+  margin: 6px;
+  width: 30%;
 }
 
 .icon-custom {
@@ -258,16 +265,12 @@ defineExpose({
   margin: 8px;
 
   /* 加上背景图 */
-  background: url("https://hexo-blog-1256114407.cos.ap-shenzhen-fsi.myqcloud.com/rules.png")
-    no-repeat;
+  background: url("https://hexo-blog-1256114407.cos.ap-shenzhen-fsi.myqcloud.com/rules.png") no-repeat;
   background-size: 100% 100%;
 }
 
 :deep(.djs-context-pad) .lindaidai-task.entry:hover {
-  background: url("https://hexo-blog-1256114407.cos.ap-shenzhen-fsi.myqcloud.com/rules.png")
-    no-repeat;
-  background-repeat: no-repeat;
-  background-position: center;
+  background: url("https://hexo-blog-1256114407.cos.ap-shenzhen-fsi.myqcloud.com/rules.png") no-repeat center;
   background-size: 95%;
 }
 
@@ -302,6 +305,7 @@ defineExpose({
     margin-right: 16px;
     cursor: pointer;
   }
+
   // background-color: red;
 }
 </style>
