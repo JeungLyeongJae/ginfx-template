@@ -33,13 +33,11 @@ func (u *UserRepo) Save(user *model.User) error {
 }
 
 func (u *UserRepo) Delete(user *model.User) error {
-	//TODO implement me
-	panic("implement me")
+	return u.db.Delete(user).Error
 }
 
 func (u *UserRepo) Update(user *model.User) error {
-	//TODO implement me
-	panic("implement me")
+	return u.db.Save(user).Error
 }
 
 var _ IUserRepo = (*UserRepo)(nil)
