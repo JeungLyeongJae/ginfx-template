@@ -33,51 +33,49 @@ export default defineComponent({
     TeamOutlined,
     FileOutlined,
   },
-  computed: {},
 
   setup() {
     const toggleColorTheme = () => {
       usingTheme.value[0] == theme.defaultAlgorithm ? usingTheme.value[0] = theme.darkAlgorithm : usingTheme.value[0] = theme.defaultAlgorithm
-      const isLight = usingTheme.value[0] == theme.defaultAlgorithm;
-      const _head = document.getElementsByTagName('head')[0] || null;
-      const _styles = Array.from(document.getElementsByTagName('link'));
-      console.log('_head:', _head)
-      console.log('_styles:', _styles)
-      _styles.forEach((style: any, index) => {
-        if (index === 2) {
-          _styles[index].parentElement.removeChild(_styles[index]);
-      }
-    });
-    if (_head) {
-      const link = document.createElement('link');
-      link.setAttribute('rel', 'stylesheet');
-      link.setAttribute('name', 'theme');
-      link.setAttribute('href', `/theme/bpmn/${isLight ? 'light' : 'dark'}.css`);
-      _head.appendChild(link);
+      //   const isLight = usingTheme.value[0] == theme.defaultAlgorithm;
+      //   const _head = document.getElementsByTagName('head')[0] || null;
+      //   const _styles = Array.from(document.getElementsByTagName('link'));
+      //   console.log('_head:', _head)
+      //   console.log('_styles:', _styles)
+      //   _styles.forEach((style: any, index) => {
+      //     if (index === 2) {
+      //       _styles[index].parentElement.removeChild(_styles[index]);
+      //   }
+      // });
+      // if (_head) {
+      //   const link = document.createElement('link');
+      //   link.setAttribute('rel', 'stylesheet');
+      //   link.setAttribute('name', 'theme');
+      //   link.setAttribute('href', `/theme/bpmn/${isLight ? 'light' : 'dark'}.css`);
+      //   _head.appendChild(link);
+      // }
+    };
+    const toggleTheme = () => {
+      usingTheme.value.length == 1 ? usingTheme.value.push(theme.compactAlgorithm) : usingTheme.value.pop()
+    };
+
+    function selectElement(info
+                               :
+                               any
+    ) {
+      console.log(info);
     }
-  };
-  const toggleTheme = () => {
-    usingTheme.value.length == 1 ? usingTheme.value.push(theme.compactAlgorithm) : usingTheme.value.pop()
-  };
 
-  function selectElement(info
-:
-any
-)
-{
-  console.log(info);
-}
-
-return {
-  collapsed,
-  selectedKeys,
-  usingTheme,
-  checked,
-  toggleColorTheme,
-  toggleTheme,
-  selectElement
-};
-}
+    return {
+      collapsed,
+      selectedKeys,
+      usingTheme,
+      checked,
+      toggleColorTheme,
+      toggleTheme,
+      selectElement
+    };
+  }
 })
 
 </script>

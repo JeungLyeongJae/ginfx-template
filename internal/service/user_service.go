@@ -2,10 +2,12 @@ package service
 
 import (
 	"ginfx-template/internal/model"
+	"ginfx-template/internal/model/response"
 	"ginfx-template/internal/repository"
 )
 
 type IUserService interface {
+	GetUserList(*response.Page) error
 	Save(user *model.User) error
 	FindByUsername(username string) (*model.User, error)
 }
@@ -19,6 +21,10 @@ func NewUserService(userRepo repository.IUserRepo) IUserService {
 }
 
 var _ IUserService = (*UserService)(nil)
+
+func (u *UserService) GetUserList(page *response.Page) error {
+	return u.userRepo.GetUserList(page)
+}
 
 func (u *UserService) Save(user *model.User) error {
 	return u.userRepo.Save(user)

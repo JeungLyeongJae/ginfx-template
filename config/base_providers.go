@@ -26,6 +26,19 @@ func ProvideWeb(lc fx.Lifecycle, handlers ginfx.Handlers, appConfig *AppConfig) 
 	}
 	app := gin.New()
 	app.Use(gin.Recovery())
+	app.Use(func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Authorization, Accept, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+
+		c.Next()
+	})
 	//app.Use(middlewares.ServeRoot("/", "dist"))
 	app.NoRoute(func(context *gin.Context) {
 		if context.Request.RequestURI != "/" {

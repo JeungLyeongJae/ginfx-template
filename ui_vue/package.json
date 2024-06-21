@@ -11,6 +11,7 @@
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
     "ant-design-vue": "^4.2.2",
+    "axios": "^1.7.2",
     "bpmn-js": "^17.2.1",
     "camunda-bpmn-moddle": "^7.0.1",
     "diagram-js": "^14.3.2",

@@ -2,10 +2,12 @@ package repository
 
 import (
 	"ginfx-template/internal/model"
+	"ginfx-template/internal/model/response"
 	"gorm.io/gorm"
 )
 
 type IUserRepo interface {
+	GetUserList(*response.Page) error
 	FindByUsername(name string) (*model.User, error)
 	Save(*model.User) error
 	Delete(*model.User) error
@@ -18,6 +20,23 @@ type UserRepo struct {
 
 func NewUserRepo(db *gorm.DB) IUserRepo {
 	return &UserRepo{db: db}
+}
+
+func (u *UserRepo) GetUserList(page *response.Page) error {
+	if page.Condition != "" {
+		return u.db.Model(&model.User{}).
+			Count(&page.TotalCount).
+			Offset((page.PageNumber-1)*page.PageSize).
+			Limit(page.PageSize).
+			Find(&page.Users, "username like ?", "%"+page.Condition).
+			Error
+	}
+	return u.db.Model(&model.User{}).
+		Count(&page.TotalCount).
+		Offset((page.PageNumber - 1) * page.PageSize).
+		Limit(page.PageSize).
+		Find(&page.Users).
+		Error
 }
 
 func (u *UserRepo) FindByUsername(name string) (*model.User, error) {
