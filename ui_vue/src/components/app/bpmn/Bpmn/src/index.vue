@@ -291,6 +291,8 @@ defineExpose({
   margin-bottom: 10px;
 }
 
+
+// 左下角图标
 .bpmn-operation {
   position: absolute;
   bottom: 2%;

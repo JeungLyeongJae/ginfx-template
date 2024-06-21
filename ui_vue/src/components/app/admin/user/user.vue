@@ -4,16 +4,7 @@ import {PlusOutlined} from '@ant-design/icons-vue';
 import UserAddComponent from './user-add.vue';
 import {getUsers} from "./user.service.ts";
 import {User} from "./user.ts";
-
-const UserMapping: Map<string, string> = new Map();
-
-UserMapping.set('name', '姓名');
-UserMapping.set('phone', '手机号');
-UserMapping.set('username', '用户名');
-UserMapping.set('enable', '是否启用');
-UserMapping.set('created_at', '创建日期');
-UserMapping.set('updated_at', '更新日期');
-UserMapping.set('last_login', '上传登录日期');
+import {cloneDeep} from "lodash-es";
 
 const columns = [
   {
@@ -51,15 +42,14 @@ const columns = [
     dataIndex: 'last_login',
     key: 'last_login',
   },
+  {
+    title: '操作',
+    dataIndex: 'operation',
+  }
 ]
 
 export default defineComponent({
   name: 'UserComponent',
-  computed: {
-    UserMapping() {
-      return UserMapping
-    }
-  },
   components: {
     PlusOutlined,
     UserAddComponent
@@ -123,15 +113,17 @@ export default defineComponent({
 
     const editableData: UnwrapRef<Record<string, User>> = reactive({});
 
-    const edit = (key: string) => {
-      // editableData[key] = cloneDeep(users.value.filter(item => key === item.key)[0]);
+    const edit = (id: number) => {
+      console.log(editableData)
+      editableData[id] = cloneDeep(users.value.filter(item => id === item.id)[0]);
     };
-    const save = (key: string) => {
-      // Object.assign(dataSource.value.filter(item => key === item.key)[0], editableData[key]);
-      // delete editableData[key];
+    const save = (id: number) => {
+      const user = users.value.filter(item => id === item.id)[0]
+      Object.assign(user, editableData[id]);
+      delete editableData[id];
     };
-    const cancel = (key: string) => {
-      delete editableData[key];
+    const cancel = (id: number) => {
+      delete editableData[id];
     };
 
     function handleResizeColumn(w, col) {
@@ -150,7 +142,6 @@ export default defineComponent({
       columns,
       handleTableChange,
       users,
-      editingKey: '',
       editableData,
       edit,
       save,
@@ -162,7 +153,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-card style="width: 100%; height: 12%; margin: 10px" :hoverable="true" :bordered="false">
+  <a-card style="width: 100%; height: 12%; margin: 10px; min-height: 90px" :hoverable="true" :bordered="false">
     <div style="align-items: center; display: flex; width: 100%;">
       <div style="width: 80%;">
         <span style="font-family: 'Microsoft YaHei', sans-serif; margin-right: 10px; color: #666666;">用户名：</span>
@@ -189,45 +180,41 @@ export default defineComponent({
   </a-card>
   <UserAddComponent :open="isOpen.valueOf()"></UserAddComponent>
 
-
   <a-card style="width: 100%; height: 88%; margin: 10px" :hoverable="true" :bordered="false">
     <a-table
-        :columns="columns.values()"
+        :columns="columns"
         :dataSource="users"
         :pagination="pagination"
         @change="handleTableChange"
         rowKey="id"
         bordered @resizeColumn="handleResizeColumn" :loading="isLoading.valueOf()">
-<!--      <template #headerCell="{ column }">-->
-<!--      </template>-->
-
-      <!--      <template #bodyCell="{ column, text, record }">-->
-      <!--        <template v-if="['name', 'age', 'address'].includes(column.dataIndex)">-->
-      <!--          <div>-->
-      <!--            <a-input-->
-      <!--                v-if="editableData[record.key]"-->
-      <!--                v-model:value="editableData[record.key][column.dataIndex]"-->
-      <!--                style="margin: -5px 0"-->
-      <!--            />-->
-      <!--            <template v-else>-->
-      <!--              {{ text }}-->
-      <!--            </template>-->
-      <!--          </div>-->
-      <!--        </template>-->
-      <!--        <template v-else-if="column.dataIndex === 'operation'">-->
-      <!--          <div class="editable-row-operations">-->
-      <!--              <span v-if="editableData[record.key]">-->
-      <!--                <a-typography-link @click="save(record.key)">Save</a-typography-link>-->
-      <!--                <a-popconfirm title="Sure to cancel?" @confirm="cancel(record.key)">-->
-      <!--                  <a>Cancel</a>-->
-      <!--                </a-popconfirm>-->
-      <!--              </span>-->
-      <!--            <span v-else>-->
-      <!--                <a @click="edit(record.key)">Edit</a>-->
-      <!--              </span>-->
-      <!--          </div>-->
-      <!--        </template>-->
-      <!--      </template>-->
+      <template #bodyCell="{ column, text, record }">
+        <template v-if="['phone','username', 'age', 'enable'].includes(column.dataIndex)">
+          <div>
+            <a-input
+                v-if="editableData[record.id]"
+                v-model:value="editableData[record.id][column.dataIndex]"
+                style="margin: -5px 0"
+            />
+            <template v-else>
+              {{ text }}
+            </template>
+          </div>
+        </template>
+        <template v-else-if="column.dataIndex === 'operation'">
+          <div class="editable-row-operations">
+          <span v-if="editableData[record.id]">
+            <a-popconfirm title="确定要修改?" @confirm="save(record.id)" ok-text="确定" cancel-text="取消">
+              <a>保存</a>
+            </a-popconfirm>
+            <a-typography-link @click="cancel(record.id)">取消</a-typography-link>
+          </span>
+            <span v-else>
+            <a @click="edit(record.id)">修改</a>
+          </span>
+          </div>
+        </template>
+      </template>
     </a-table>
   </a-card>
 </template>
