@@ -2,7 +2,7 @@
 import {defineComponent, onMounted, reactive, ref, UnwrapRef} from "vue";
 import {PlusOutlined} from '@ant-design/icons-vue';
 import UserAddComponent from './user-add.vue';
-import {getUsers} from "./user.service.ts";
+import {getUsers, updateUser} from "./user.service.ts";
 import {User} from "./user.ts";
 import {cloneDeep} from "lodash-es";
 
@@ -59,6 +59,12 @@ export default defineComponent({
     const search = ref<string>('');
     const isOpen = ref<Boolean>(false);
     const isLoading = ref<Boolean>(false);
+    const isSaving = ref<Boolean>(false);
+    const alert = reactive({
+      visible: false,
+      message: '',
+      type: 'info' as 'success' | 'info' | 'warning' | 'error'
+    });
 
     // user list
     const users = ref<User[]>([]);
@@ -68,15 +74,37 @@ export default defineComponent({
 
     const fetchUsers = async () => {
       isLoading.value = true;
-      try {
-        const response = await getUsers({page_number: page.value, page_size: limit.value, condition: search.value});
-        users.value = response.users!;
-        total.value = response.total_count!;
-        isLoading.value = false;
-      } catch (err) {
-        console.error('Failed to fetch users:', err);
-      }
+      setTimeout(async () => {
+        try {
+          const response = await getUsers({page_number: page.value, page_size: limit.value, condition: search.value});
+          users.value = [];
+          users.value = response.users!;
+          total.value = response.total_count!;
+          isLoading.value = false;
+        } catch (err) {
+          isLoading.value = false;
+          console.error('Failed to fetch users:', err);
+        }
+      }, 1000)
     };
+
+    const saveUser = async (user: User) => {
+      try {
+        await updateUser(user);
+        alert.message = 'Data saved successfully!';
+        alert.type = 'success';
+      } catch (err) {
+        console.error('Failed to update user:', err);
+        alert.message = 'Failed to save data.';
+        alert.type = 'error';
+      } finally {
+        const u = users.value.filter(item => user.id === item.id)[0]
+        Object.assign(u, editableData[user.id!]);
+        delete editableData[user.id!];
+        alert.visible = true;
+        await fetchUsers()
+      }
+    }
 
     onMounted(() => {
       fetchUsers();
@@ -90,7 +118,6 @@ export default defineComponent({
     // 刷新
     const onReload = () => {
       search.value = '';
-      users.value = [];
       fetchUsers();
     };
 
@@ -111,16 +138,16 @@ export default defineComponent({
       fetchUsers();
     };
 
-    const editableData: UnwrapRef<Record<string, User>> = reactive({});
+    const editableData: UnwrapRef<Record<number, User>> = reactive({});
 
     const edit = (id: number) => {
-      console.log(editableData)
       editableData[id] = cloneDeep(users.value.filter(item => id === item.id)[0]);
     };
     const save = (id: number) => {
-      const user = users.value.filter(item => id === item.id)[0]
-      Object.assign(user, editableData[id]);
-      delete editableData[id];
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(saveUser(editableData[id])), 1000);
+      });
+
     };
     const cancel = (id: number) => {
       delete editableData[id];
@@ -134,6 +161,8 @@ export default defineComponent({
       search,
       isOpen,
       isLoading,
+      isSaving,
+      alert,
       onSearch,
       onReload,
       showModal,
@@ -153,7 +182,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <a-card style="width: 100%; height: 12%; margin: 10px; min-height: 90px" :hoverable="true" :bordered="false">
+  <a-card style="width: 100%; height: 12%; margin: 10px; min-height: 90px; min-width: 500px" :hoverable="true"
+          :bordered="false">
     <div style="align-items: center; display: flex; width: 100%;">
       <div style="width: 80%;">
         <span style="font-family: 'Microsoft YaHei', sans-serif; margin-right: 10px; color: #666666;">用户名：</span>
@@ -162,7 +192,7 @@ export default defineComponent({
             placeholder="请输入用户名"
             enter-button
             @search="onSearch"
-            style="width: 50%; margin-right: 10px"
+            style="width: 200px; margin-right: 10px"
         />
         <a-button type="primary" @click="onReload">
           <span style="font-family: 'Microsoft YaHei', sans-serif;">刷新</span>
@@ -178,16 +208,27 @@ export default defineComponent({
       </div>
     </div>
   </a-card>
-  <UserAddComponent :open="isOpen.valueOf()"></UserAddComponent>
+  <!--  <UserAddComponent :isOpened="isOpen.valueOf()"></UserAddComponent>-->
 
-  <a-card style="width: 100%; height: 88%; margin: 10px" :hoverable="true" :bordered="false">
+  <a-card style="width: 100%; height: 88%; margin: 10px; min-width: 500px" :hoverable="true" :bordered="false">
+    <a-alert
+        v-if="alert.visible"
+        :message="alert.message"
+        :type="alert.type"
+        show-icon
+        closable
+        :banner="true"
+        @close="alert.visible = false"
+    />
     <a-table
         :columns="columns"
         :dataSource="users"
         :pagination="pagination"
         @change="handleTableChange"
         rowKey="id"
-        bordered @resizeColumn="handleResizeColumn" :loading="isLoading.valueOf()">
+        bordered @resizeColumn="handleResizeColumn"
+        :loading="isLoading.valueOf()"
+        :scroll="{ x: 800 }">
       <template #bodyCell="{ column, text, record }">
         <template v-if="['phone','username', 'age', 'enable'].includes(column.dataIndex)">
           <div>
@@ -201,6 +242,19 @@ export default defineComponent({
             </template>
           </div>
         </template>
+        <!--        <template v-else-if="['phone','username', 'age', 'enable'].includes(column.dataIndex)">-->
+        <!--          <div class="editable-row-operations">-->
+        <!--          <span v-if="editableData[record.id]">-->
+        <!--            <a-popconfirm title="确定要修改?" @confirm="save(record.id)" ok-text="确定" cancel-text="取消">-->
+        <!--              <a>保存</a>-->
+        <!--            </a-popconfirm>-->
+        <!--            <a-typography-link @click="cancel(record.id)">取消</a-typography-link>-->
+        <!--          </span>-->
+        <!--            <span v-else>-->
+        <!--            <a @click="edit(record.id)">修改</a>-->
+        <!--          </span>-->
+        <!--          </div>-->
+        <!--        </template>-->
         <template v-else-if="column.dataIndex === 'operation'">
           <div class="editable-row-operations">
           <span v-if="editableData[record.id]">

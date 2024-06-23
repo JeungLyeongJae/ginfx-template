@@ -9,6 +9,7 @@ import (
 type IUserService interface {
 	GetUserList(*response.Page) error
 	Save(user *model.User) error
+	Update(user *model.User) error
 	FindByUsername(username string) (*model.User, error)
 }
 
@@ -28,6 +29,10 @@ func (u *UserService) GetUserList(page *response.Page) error {
 
 func (u *UserService) Save(user *model.User) error {
 	return u.userRepo.Save(user)
+}
+
+func (u *UserService) Update(user *model.User) error {
+	return u.userRepo.Update(user)
 }
 
 func (u *UserService) FindByUsername(username string) (*model.User, error) {

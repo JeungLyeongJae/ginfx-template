@@ -20,3 +20,8 @@ const apiClient = axios.create({
 export const getUsers = async (params: UserPagination): Promise<UserPagination> => {
     return (await apiClient.get<UserPagination>('/api/user/list', { params })).data;
 };
+
+// 编辑用户
+export const updateUser = async (params: User) => {
+    return (await apiClient.post<User>('/api/user/update',  params));
+};

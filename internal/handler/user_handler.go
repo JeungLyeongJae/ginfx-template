@@ -28,6 +28,7 @@ func (u *UserHandler) Routes() []ginfx.Route {
 		u.hello(),
 		u.getUserList(),
 		u.addUser(),
+		u.UpdateUser(),
 	}
 }
 
@@ -92,6 +93,36 @@ func (u *UserHandler) addUser() ginfx.Route {
 				return
 			}
 			ctx.JSON(http.StatusOK, "用户创建成功！")
+		}
+	}
+}
+
+// UpdateUser
+// @Summary      编辑用户
+// @Description
+// @Tags         用户管理
+// @Produce      json
+// @Param        user  body  model.User  true  "User信息"
+// @Success      200  {object}  string "ok"
+// @Failure      400  {object}  string 报错信息
+// @Router       /api/user/update [post]
+func (u *UserHandler) UpdateUser() ginfx.Route {
+	return func() (method string, pattern string, handler gin.HandlerFunc) {
+		return "POST", "/api/user/update", func(ctx *gin.Context) {
+			var user model.User
+			err := ctx.ShouldBind(&user)
+			if err != nil {
+				logger.Error(err)
+				ctx.JSON(http.StatusBadRequest, "用户保存失败！请联系系统管理员！")
+				return
+			}
+			err = u.userService.Update(&user)
+			if err != nil {
+				logger.Error(err)
+				ctx.JSON(http.StatusBadRequest, "用户保存失败！请联系系统管理员!")
+				return
+			}
+			ctx.JSON(http.StatusOK, "用户保存成功！")
 		}
 	}
 }

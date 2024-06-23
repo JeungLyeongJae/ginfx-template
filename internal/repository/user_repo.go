@@ -28,7 +28,7 @@ func (u *UserRepo) GetUserList(page *response.Page) error {
 			Count(&page.TotalCount).
 			Offset((page.PageNumber-1)*page.PageSize).
 			Limit(page.PageSize).
-			Find(&page.Users, "username like ?", "%"+page.Condition).
+			Find(&page.Users, "username like ?", "%"+page.Condition+"%").
 			Error
 	}
 	return u.db.Model(&model.User{}).

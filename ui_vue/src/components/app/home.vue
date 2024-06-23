@@ -24,7 +24,7 @@ let usingTheme = ref([theme.defaultAlgorithm])
 
 onMounted(() => {
   const currentHour = new Date().getHours();
-  if ((sessionStorage.getItem('toggleColorThemeButtonType') != null && sessionStorage.getItem('toggleColorThemeButtonType') == 'default') || currentHour >= 6 && currentHour < 18) {
+  if (sessionStorage.getItem('toggleColorThemeButtonType') == 'default' || (sessionStorage.getItem('toggleColorThemeButtonType') == null && currentHour >= 6 && currentHour < 18)) {
     usingTheme.value[0] = theme.defaultAlgorithm
     toggleColorThemeButtonType.value = 'default'
   } else {
@@ -85,7 +85,6 @@ function selectElement(info: any) {
 
 
 </script>
-
 
 <template>
   <a-config-provider :theme="{token: {borderRadius: 16}, algorithm: usingTheme}">
@@ -189,7 +188,7 @@ function selectElement(info: any) {
   display: flex;
   width: 120px;
   height: 25px;
-  margin: 25px 5px 5px -10px;
+  margin: 15px 5px 5px -10px;
   border-radius: 10px;
   padding: 5px;
   font-size: 13px;

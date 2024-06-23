@@ -1,23 +1,36 @@
 <script lang="ts">
-import {defineComponent, onMounted, ref} from 'vue';
+import {defineComponent, onMounted, PropType, toRefs} from 'vue';
 
 
 export default defineComponent({
   name: 'UserAddComponent',
   props: {
-    open: Boolean
+    isOpened: {
+      type: Boolean as PropType<boolean>,
+      required: true
+    }
   },
 
-  setup() {
-    const isOpened = ref<Boolean>(false);
+  setup(props) {
+
+    let isOpen  = toRefs(props);
+
+    onMounted(() => {
+      console.log(isOpen)
+    })
 
     const handleOk = (e: MouseEvent) => {
       console.log(e);
     };
 
+    const handleCancel = (e: MouseEvent) => {
+      console.log(e);
+    };
+
     return {
-      isOpened,
-      handleOk
+      isOpen,
+      handleOk,
+      handleCancel
     }
   }
 })
@@ -26,7 +39,7 @@ export default defineComponent({
 <template>
   <div>
     <!--    <a-button type="primary" @click="showModal">Open Modal</a-button>-->
-    <a-modal v-model:open="isOpened" title="新增用户" @ok="handleOk">
+    <a-modal v-model:open="isOpen" title="新增用户" @ok="handleOk" @cancel="handleCancel">
       <p>Some contents...</p>
       <p>Some contents...</p>
       <p>Some contents...</p>
