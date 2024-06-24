@@ -156,7 +156,7 @@ function selectElement(info: any) {
     </a-layout>
   </a-config-provider>
 
-  <a-float-button-group shape="circle" :style="{ right: '18px' }" trigger="hover">
+  <a-float-button-group shape="circle" :style="{ right: '18px', position: 'fixed' }" trigger="hover">
     <template #icon>
       <ToolOutlined/>
     </template>

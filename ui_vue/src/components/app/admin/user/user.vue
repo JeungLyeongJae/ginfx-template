@@ -1,190 +1,177 @@
-<script lang="ts">
-import {defineComponent, onMounted, reactive, ref, UnwrapRef} from "vue";
+<script lang="ts" setup>
+import {onMounted, reactive, ref, toRefs, UnwrapRef} from "vue";
 import {PlusOutlined} from '@ant-design/icons-vue';
-import UserAddComponent from './user-add.vue';
 import {getUsers, updateUser} from "./user.service.ts";
 import {User} from "./user.ts";
 import {cloneDeep} from "lodash-es";
+import moment from 'moment';
+import {PaginationType} from "../../../../../public/model/pagination.ts";
 
-const columns = [
-  {
-    title: '姓名',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: '手机号',
-    dataIndex: 'phone',
-    key: 'phone',
-  },
-  {
-    title: '用户名',
-    dataIndex: 'username',
-    key: 'username',
-  },
-  {
-    title: '是否启用',
-    dataIndex: 'enable',
-    key: 'enable',
-  },
-  {
-    title: '创建日期',
-    dataIndex: 'created_at',
-    key: 'created_at',
-  },
-  {
-    title: '更新日期',
-    dataIndex: 'updated_at',
-    key: 'updated_at',
-  },
-  {
-    title: '上传登录日期',
-    dataIndex: 'last_login',
-    key: 'last_login',
-  },
-  {
-    title: '操作',
-    dataIndex: 'operation',
-  }
-]
+// 搜索框
+const search = ref<string>('');
 
-export default defineComponent({
-  name: 'UserComponent',
-  components: {
-    PlusOutlined,
-    UserAddComponent
-  },
+// 新增用户model
+const isOpen = ref<Boolean>(false);
 
-  setup() {
-    const search = ref<string>('');
-    const isOpen = ref<Boolean>(false);
-    const isLoading = ref<Boolean>(false);
-    const isSaving = ref<Boolean>(false);
-    const alert = reactive({
-      visible: false,
-      message: '',
-      type: 'info' as 'success' | 'info' | 'warning' | 'error'
-    });
-
-    // user list
-    const users = ref<User[]>([]);
-    const page = ref(1);
-    const limit = ref(10);
-    const total = ref<number>();
-
-    const fetchUsers = async () => {
-      isLoading.value = true;
-      setTimeout(async () => {
-        try {
-          const response = await getUsers({page_number: page.value, page_size: limit.value, condition: search.value});
-          users.value = [];
-          users.value = response.users!;
-          total.value = response.total_count!;
-          isLoading.value = false;
-        } catch (err) {
-          isLoading.value = false;
-          console.error('Failed to fetch users:', err);
-        }
-      }, 1000)
-    };
-
-    const saveUser = async (user: User) => {
-      try {
-        await updateUser(user);
-        alert.message = 'Data saved successfully!';
-        alert.type = 'success';
-      } catch (err) {
-        console.error('Failed to update user:', err);
-        alert.message = 'Failed to save data.';
-        alert.type = 'error';
-      } finally {
-        const u = users.value.filter(item => user.id === item.id)[0]
-        Object.assign(u, editableData[user.id!]);
-        delete editableData[user.id!];
-        alert.visible = true;
-        await fetchUsers()
-      }
+// user table
+const userTable = reactive({
+  columns: [
+    {
+      title: '用户名',
+      dataIndex: 'username',
+      key: 'username',
+    },
+    {
+      title: '姓名',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: '手机号',
+      dataIndex: 'phone',
+      key: 'phone',
+    },
+    {
+      title: '是否启用',
+      dataIndex: 'enable',
+      key: 'enable',
+    },
+    {
+      title: '创建日期',
+      dataIndex: 'created_at',
+      key: 'created_at',
+    },
+    {
+      title: '更新日期',
+      dataIndex: 'updated_at',
+      key: 'updated_at',
+    },
+    {
+      title: '上次登录',
+      dataIndex: 'last_login',
+      key: 'last_login',
+    },
+    {
+      title: '操作',
+      dataIndex: 'operation',
     }
-
-    onMounted(() => {
-      fetchUsers();
-    });
-
-    // 用户名搜索
-    const onSearch = () => {
-      fetchUsers();
-    };
-
-    // 刷新
-    const onReload = () => {
-      search.value = '';
-      fetchUsers();
-    };
-
-    // 新增用户
-    const showModal = () => {
-      isOpen.value = true
-    };
-
-    const pagination = ref({
-      current: page.value,
-      pageSize: limit.value,
-      total: total.value,
-      showSizeChanger: true,
-      showQuickJumper: true,
-    });
-
-    const handleTableChange = () => {
-      fetchUsers();
-    };
-
-    const editableData: UnwrapRef<Record<number, User>> = reactive({});
-
-    const edit = (id: number) => {
-      editableData[id] = cloneDeep(users.value.filter(item => id === item.id)[0]);
-    };
-    const save = (id: number) => {
-      return new Promise((resolve) => {
-        setTimeout(() => resolve(saveUser(editableData[id])), 1000);
-      });
-
-    };
-    const cancel = (id: number) => {
-      delete editableData[id];
-    };
-
-    function handleResizeColumn(w, col) {
-      col.width = w;
-    }
-
-    return {
-      search,
-      isOpen,
-      isLoading,
-      isSaving,
-      alert,
-      onSearch,
-      onReload,
-      showModal,
-
-      pagination,
-      columns,
-      handleTableChange,
-      users,
-      editableData,
-      edit,
-      save,
-      cancel,
-      handleResizeColumn,
-    }
-  },
+  ],
+  data: [] as User[],
+  pagination: {
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    showSizeChanger: true,
+    showQuickJumper: true,
+  } as PaginationType,
+  isLoading: false,
+})
+const isLoading = ref<Boolean>(false);
+const alert = reactive({
+  visible: false,
+  message: '',
+  type: 'info' as 'success' | 'info' | 'warning' | 'error'
 });
+
+// 初始化执行
+onMounted(() => {
+  fetchUsers();
+});
+
+// 用户名搜索
+const onSearch = () => {
+  fetchUsers();
+};
+
+// 刷新
+const onReload = () => {
+  search.value = '';
+  fetchUsers();
+};
+
+// 新增用户
+const showModal = () => {
+  isOpen.value = true
+};
+
+onMounted(() => {
+  console.log(isOpen)
+})
+
+const handleOk = (e: MouseEvent) => {
+  console.log(e);
+};
+
+const handleCancel = (e: MouseEvent) => {
+  console.log(e);
+};
+
+// getUserList
+const fetchUsers = async () => {
+  isLoading.value = true;
+  setTimeout(async () => {
+    try {
+      const response = await getUsers({page_number: userTable.pagination.current, page_size: userTable.pagination.pageSize, condition: search.value});
+      userTable.data = [];
+      userTable.data = response.users!;
+      userTable.pagination.total = response.total_count!;
+
+      isLoading.value = false;
+    } catch (err) {
+      isLoading.value = false;
+      console.error('Failed to fetch users:', err);
+    }
+  }, 1000)
+};
+
+// updateUser
+const saveUser = async (user: User) => {
+  try {
+    await updateUser(user);
+    alert.message = 'Data saved successfully!';
+    alert.type = 'success';
+  } catch (err) {
+    console.error('Failed to update user:', err);
+    alert.message = 'Failed to save data.';
+    alert.type = 'error';
+  } finally {
+    const u = userTable.data.filter(item => user.id === item.id)[0]
+    Object.assign(u, editableData[user.id!]);
+    delete editableData[user.id!];
+    alert.visible = true;
+    await fetchUsers()
+  }
+}
+
+// 分页操作
+const handleTableChange = (p: PaginationType) => {
+  userTable.pagination = p
+  fetchUsers();
+};
+
+const editableData: UnwrapRef<Record<number, User>> = reactive({});
+
+const edit = (id: number) => {
+  editableData[id] = cloneDeep(userTable.data.filter(item => id === item.id)[0]);
+};
+
+const save = (id: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(saveUser(editableData[id])), 1000);
+  });
+
+};
+
+const cancel = (id: number) => {
+  delete editableData[id];
+};
+
 </script>
 
 <template>
   <a-card style="width: 100%; height: 12%; margin: 10px; min-height: 90px; min-width: 500px" :hoverable="true"
           :bordered="false">
-    <div style="align-items: center; display: flex; width: 100%;">
+    <div style="align-items: center; display: flex; width: 100%; margin-top: 1.5%">
       <div style="width: 80%;">
         <span style="font-family: 'Microsoft YaHei', sans-serif; margin-right: 10px; color: #666666;">用户名：</span>
         <a-input-search
@@ -210,6 +197,12 @@ export default defineComponent({
   </a-card>
   <!--  <UserAddComponent :isOpened="isOpen.valueOf()"></UserAddComponent>-->
 
+  <a-modal v-model:open="isOpen" title="新增用户" @ok="handleOk" @cancel="handleCancel">
+    <p>Some contents...</p>
+    <p>Some contents...</p>
+    <p>Some contents...</p>
+  </a-modal>
+
   <a-card style="width: 100%; height: 88%; margin: 10px; min-width: 500px" :hoverable="true" :bordered="false">
     <a-alert
         v-if="alert.visible"
@@ -221,16 +214,15 @@ export default defineComponent({
         @close="alert.visible = false"
     />
     <a-table
-        :columns="columns"
-        :dataSource="users"
-        :pagination="pagination"
+        :columns="userTable.columns"
+        :dataSource="userTable.data"
+        :pagination="userTable.pagination"
         @change="handleTableChange"
         rowKey="id"
-        bordered @resizeColumn="handleResizeColumn"
         :loading="isLoading.valueOf()"
-        :scroll="{ x: 800 }">
+        :scroll="{ x: 1000 }">
       <template #bodyCell="{ column, text, record }">
-        <template v-if="['phone','username', 'age', 'enable'].includes(column.dataIndex)">
+        <template v-if="['phone','username', 'age'].includes(column.dataIndex)">
           <div>
             <a-input
                 v-if="editableData[record.id]"
@@ -242,19 +234,12 @@ export default defineComponent({
             </template>
           </div>
         </template>
-        <!--        <template v-else-if="['phone','username', 'age', 'enable'].includes(column.dataIndex)">-->
-        <!--          <div class="editable-row-operations">-->
-        <!--          <span v-if="editableData[record.id]">-->
-        <!--            <a-popconfirm title="确定要修改?" @confirm="save(record.id)" ok-text="确定" cancel-text="取消">-->
-        <!--              <a>保存</a>-->
-        <!--            </a-popconfirm>-->
-        <!--            <a-typography-link @click="cancel(record.id)">取消</a-typography-link>-->
-        <!--          </span>-->
-        <!--            <span v-else>-->
-        <!--            <a @click="edit(record.id)">修改</a>-->
-        <!--          </span>-->
-        <!--          </div>-->
-        <!--        </template>-->
+        <template v-else-if="['enable'].includes(column.dataIndex)">
+          <a-switch :checked="text == 1" />
+        </template>
+        <template v-else-if="['created_at','updated_at', 'last_login'].includes(column.dataIndex)">
+          {{ text == '' || text == null ? '-' : moment(text).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
         <template v-else-if="column.dataIndex === 'operation'">
           <div class="editable-row-operations">
           <span v-if="editableData[record.id]">
