@@ -10,11 +10,16 @@ export interface UserPagination {
 }
 
 const apiClient = axios.create({
-    baseURL: 'http://127.0.0.1:9060', // 替换为你的 API 基础 URL
+    baseURL: 'http://10.18.16.33:9060', // 替换为你的 API 基础 URL
     headers: {
         'Content-Type': 'application/json',
     },
 });
+
+// 获取用户列表
+export const isExistUserName = async (params: { username: string }): Promise<boolean> => {
+    return (await apiClient.get<boolean>('/api/user/is_exist_username', { params })).data;
+};
 
 // 获取用户列表
 export const getUsers = async (params: UserPagination): Promise<UserPagination> => {

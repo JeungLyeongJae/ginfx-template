@@ -7,6 +7,7 @@ import (
 )
 
 type IUserService interface {
+	IsExistByUsername(username string) (bool, error)
 	GetUserList(*response.Page) error
 	Save(user *model.User) error
 	Update(user *model.User) error
@@ -22,6 +23,10 @@ func NewUserService(userRepo repository.IUserRepo) IUserService {
 }
 
 var _ IUserService = (*UserService)(nil)
+
+func (u *UserService) IsExistByUsername(username string) (bool, error) {
+	return u.userRepo.IsExistByUsername(username)
+}
 
 func (u *UserService) GetUserList(page *response.Page) error {
 	return u.userRepo.GetUserList(page)

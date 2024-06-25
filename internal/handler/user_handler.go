@@ -25,17 +25,33 @@ var _ ginfx.Handler = (*UserHandler)(nil)
 
 func (u *UserHandler) Routes() []ginfx.Route {
 	return []ginfx.Route{
-		u.hello(),
+		u.IsExistByUsername(),
 		u.getUserList(),
 		u.addUser(),
 		u.UpdateUser(),
 	}
 }
 
-func (u *UserHandler) hello() ginfx.Route {
+// IsExistByUsername
+// @Summary      用户列表
+// @Description
+// @Tags         用户管理
+// @Produce      json
+// @Param        username {object} string true  "查询用户名"
+// @Success      200  {object}  boolean 是否存在
+// @Failure      400  {object}  string 报错信息
+// @Router       /api/user/is_exist_username [get]
+func (u *UserHandler) IsExistByUsername() ginfx.Route {
 	return func() (method string, pattern string, handler gin.HandlerFunc) {
-		return "GET", "/api/users", func(ctx *gin.Context) {
-			ctx.JSON(http.StatusOK, gin.H{"hello": "world"})
+		return "GET", "/api/user/is_exist_username", func(ctx *gin.Context) {
+			username := ctx.Query("username")
+			isExist, err := u.userService.IsExistByUsername(username)
+			if err != nil {
+				logger.Error(err)
+				ctx.JSON(http.StatusBadRequest, "系统查询失败！请联系系统管理员!")
+				return
+			}
+			ctx.JSON(http.StatusOK, isExist)
 		}
 	}
 }
