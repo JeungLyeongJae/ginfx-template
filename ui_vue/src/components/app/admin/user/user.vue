@@ -1,33 +1,76 @@
 <script lang="ts" setup>
-import {onMounted, reactive, ref, UnwrapRef} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {PlusOutlined} from '@ant-design/icons-vue';
-import {getUsers, updateUser} from "./user.service.ts";
+import {deleteUser, getUsers, updateUser} from "./user.service.ts";
 import {User} from "./user.ts";
-import {cloneDeep} from "lodash-es";
 import moment from 'moment';
 import {PaginationType} from "../../../../../public/model/pagination.ts";
-import {Rule} from "ant-design-vue/es/form";
 import UserAddComponent from "./user-add.vue";
+import {message} from "ant-design-vue";
+import UserEdit from "./user-edit.vue";
 
 // 搜索框
 const search = ref<string>('');
 
 // 新增用户model
-const isOpened = ref<Boolean>(false);
-const handleIsOpenedChange = (value: boolean) => {
-  isOpened.value = value
+const showAddModal = () => {
+  isAddUserOpened.value = true
+};
+const isAddUserOpened = ref<Boolean>(false);
+const handleIsAddUserOpenedChange = (data: { isOpened: boolean, submitStatus: boolean }) => {
+  isAddUserOpened.value = data.isOpened
+  if (data.submitStatus) {
+    fetchUsers()
+  }
 };
 
-const validateUserName = async (_rule: Rule, value: string) => {
-  console.log(value)
-  if (!value) {
-    return Promise.reject('请输入用户名!');
-  }
-  if (value.length < 3) {
-    return Promise.reject('用户名不能小于3位英文');
-  }
-  return Promise.resolve();
+// 编辑用户model
+const showUpdateModal = (id: number) => {
+  isUpdateUser.value = userTable.data.filter(item => id === item.id)[0]
+  isUpdateUserOpened.value = true
 };
+const isUpdateUserOpened = ref<Boolean>(false);
+const isUpdateUser = ref<User>(new User());
+const handleIsUpdateUserOpenedChange = (data: { isOpened: boolean, submitStatus: boolean }) => {
+  isUpdateUserOpened.value = data.isOpened
+  if (data.submitStatus) {
+    fetchUsers()
+  }
+};
+
+// 编辑用户是否启用
+const isEnabled = (id: number) => {
+  const user = userTable.data.filter(item => id === item.id)[0]
+  user.enable = !user.enable
+  isLoading.value = true;
+  setTimeout(async () => {
+    try {
+      await updateUser(user);
+      isLoading.value = false;
+      user.enable ? message.success('启用成功！') : message.success('禁用成功！');
+    } catch (err) {
+      isLoading.value = false;
+      user.enable = !user.enable
+      user.enable ? message.error('启用失败！') : message.error('禁用失败！');
+    }
+  }, 200)
+}
+
+// 删除用户
+const deletedUser = (id: number) => {
+  return new Promise<void>((resolve) => {
+    setTimeout(async () => {
+      try {
+        await deleteUser({id: id})
+        message.success('删除成功！');
+      } catch (err) {
+        message.error('删除失败！');
+      }
+    }, 1000);
+    fetchUsers();
+    resolve();
+  });
+}
 
 // user table
 const userTable = reactive({
@@ -35,8 +78,7 @@ const userTable = reactive({
     {
       title: '用户名',
       dataIndex: 'username',
-      key: 'username',
-      rules: [{required: true, validator: validateUserName}]
+      key: 'username'
     },
     {
       title: '姓名',
@@ -47,6 +89,11 @@ const userTable = reactive({
       title: '手机号',
       dataIndex: 'phone',
       key: 'phone',
+    },
+    {
+      title: '邮箱',
+      dataIndex: 'email',
+      key: 'email',
     },
     {
       title: '是否启用',
@@ -84,11 +131,6 @@ const userTable = reactive({
   isLoading: false,
 })
 const isLoading = ref<Boolean>(false);
-const alert = reactive({
-  visible: false,
-  message: '',
-  type: 'info' as 'success' | 'info' | 'warning' | 'error'
-});
 
 // 初始化执行
 onMounted(() => {
@@ -104,11 +146,6 @@ const onSearch = () => {
 const onReload = () => {
   search.value = '';
   fetchUsers();
-};
-
-// 新增用户
-const showModal = () => {
-  isOpened.value = true
 };
 
 // getUserList
@@ -133,55 +170,17 @@ const fetchUsers = async () => {
   }, 1000)
 };
 
-// updateUser
-const saveUser = async (user: User) => {
-  try {
-    await updateUser(user);
-    alert.message = 'Data saved successfully!';
-    alert.type = 'success';
-  } catch (err) {
-    console.error('Failed to update user:', err);
-    alert.message = 'Failed to save data.';
-    alert.type = 'error';
-  } finally {
-    const u = userTable.data.filter(item => user.id === item.id)[0]
-    Object.assign(u, editableData[user.id!]);
-    delete editableData[user.id!];
-    alert.visible = true;
-    await fetchUsers()
-  }
-}
-
 // 分页操作
 const handleTableChange = (p: PaginationType) => {
   userTable.pagination = p
   fetchUsers();
 };
-
-const editableData: UnwrapRef<Record<number, User>> = reactive({});
-
-const edit = (id: number) => {
-  editableData[id] = cloneDeep(userTable.data.filter(item => id === item.id)[0]);
-};
-
-const save = (id: number) => {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(saveUser(editableData[id])), 1000);
-  });
-
-};
-
-const cancel = (id: number) => {
-  delete editableData[id];
-};
-
-const form = ref<User>();
 </script>
 
 <template>
-  <a-card style="width: 100%; height: 12%; margin: 10px; min-height: 90px; min-width: 500px" :hoverable="true"
+  <a-card style="width: 100%; height: 10%; margin: 10px; min-height: 90px; min-width: 500px" :hoverable="true"
           :bordered="false">
-    <div style="align-items: center; display: flex; width: 100%; margin-top: 1.5%">
+    <div style="align-items: center; display: flex; width: 100%; margin-top: 1%">
       <div style="width: 80%;">
         <span style="font-family: 'Microsoft YaHei', sans-serif; margin-right: 10px; color: #666666;">用户名：</span>
         <a-input-search
@@ -196,7 +195,7 @@ const form = ref<User>();
         </a-button>
       </div>
       <div style="width: 20%; justify-content: flex-end;">
-        <a-button type="primary" style="float: right" @click="showModal">
+        <a-button type="primary" style="float: right" @click="showAddModal">
           <a-space style="margin-right: 5px">
             <PlusOutlined/>
           </a-space>
@@ -205,62 +204,44 @@ const form = ref<User>();
       </div>
     </div>
   </a-card>
-  <UserAddComponent :isOpened="isOpened.valueOf()" @handleIsOpenedChange="handleIsOpenedChange"></UserAddComponent>
+  <UserAddComponent :isOpened="isAddUserOpened.valueOf()"
+                    @handleIsOpenedChange="handleIsAddUserOpenedChange">
+  </UserAddComponent>
 
-  <a-card style="width: 100%; height: 88%; margin: 10px; min-width: 500px" :hoverable="true" :bordered="false">
-    <a-form :form="form" @submit.prevent="save">
-      <a-table
-          :columns="userTable.columns"
-          :dataSource="userTable.data"
-          :pagination="userTable.pagination"
-          @change="handleTableChange"
-          rowKey="id"
-          :loading="isLoading.valueOf()"
-          :scroll="{ x: 1000 }">
-        <template #bodyCell="{ column, text, record }">
-          <template v-if="['phone','username', 'age'].includes(column.dataIndex)">
-            <div>
-              <a-form-item v-if="editableData[record.id]"
-                           :name="column.dataIndex"
-                           :rules="column.rules">
-                <a-input v-model:value="record[column.dataIndex]"/>
-                <!--                <a-input-->
-                <!--                    v-model:value="editableData[record.id][column.dataIndex]"-->
-                <!--                    style="margin: -5px 0"-->
-                <!--                />-->
-              </a-form-item>
-              <template v-else>
-                {{ text }}
-              </template>
-            </div>
-          </template>
-          <template v-else-if="['enable'].includes(column.dataIndex)">
-            <a-switch :checked="text == 1"/>
-          </template>
-          <template v-else-if="['created_at','updated_at', 'last_login'].includes(column.dataIndex)">
-            {{ text == '' || text == null ? '-' : moment(text).format('YYYY-MM-DD HH:mm:ss') }}
-          </template>
-          <template v-else-if="column.dataIndex === 'operation'">
-            <div class="editable-row-operations">
-          <span v-if="editableData[record.id]">
-            <a-popconfirm title="确定要修改?" @confirm="save(record.id)" ok-text="确定" cancel-text="取消">
-              <a>保存</a>
-            </a-popconfirm>
-            <a-typography-link @click="cancel(record.id)">取消</a-typography-link>
-          </span>
-              <span v-else>
-            <a @click="edit(record.id)">修改</a>
-          </span>
-            </div>
-          </template>
+  <a-card style="width: 100%; height: auto; margin: 10px; min-width: 500px" :hoverable="true" :bordered="false">
+    <a-table
+        :columns="userTable.columns"
+        :dataSource="userTable.data"
+        :pagination="userTable.pagination"
+        @change="handleTableChange"
+        :loading="isLoading.valueOf()"
+        :scroll="{ x: 1000 }">
+      <template #bodyCell="{ column, text, record }">
+        <template v-if="['enable'].includes(column.dataIndex)">
+          <a-switch :checked="text" @change="isEnabled(record.id)"/>
         </template>
-      </a-table>
-    </a-form>
+        <template v-else-if="['created_at','updated_at', 'last_login'].includes(column.dataIndex)">
+          {{ text == '' || text == null ? '-' : moment(text).format('YYYY-MM-DD HH:mm:ss') }}
+        </template>
+        <template v-else-if="column.dataIndex === 'operation'">
+          <span>
+            <a @click="showUpdateModal(record.id)">修改</a>
+          </span>
+          <span style="margin-left: 3px; color: #666666">
+            |
+          </span>
+          <span style="margin-left: 3px">
+            <a-popconfirm title="确定要删除?" @confirm="deletedUser(record.id)" ok-text="确定" cancel-text="取消">
+              <a>删除</a>
+            </a-popconfirm>
+          </span>
+        </template>
+      </template>
+    </a-table>
   </a-card>
+  <UserEdit :isOpened="isUpdateUserOpened.valueOf()" :user="isUpdateUser.valueOf()"
+            @handleIsOpenedChange="handleIsUpdateUserOpenedChange"></UserEdit>
 </template>
 
 <style scoped>
-.editable-row-operations a {
-  margin-right: 8px;
-}
 </style>

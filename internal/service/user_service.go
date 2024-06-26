@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	"ginfx-template/internal/model"
 	"ginfx-template/internal/model/response"
 	"ginfx-template/internal/repository"
@@ -9,9 +11,10 @@ import (
 type IUserService interface {
 	IsExistByUsername(username string) (bool, error)
 	GetUserList(*response.Page) error
-	Save(user *model.User) error
+	Create(user *model.User) error
 	Update(user *model.User) error
 	FindByUsername(username string) (*model.User, error)
+	Delete(user *model.User) error
 }
 
 type UserService struct {
@@ -32,8 +35,15 @@ func (u *UserService) GetUserList(page *response.Page) error {
 	return u.userRepo.GetUserList(page)
 }
 
-func (u *UserService) Save(user *model.User) error {
-	return u.userRepo.Save(user)
+func (u *UserService) Create(user *model.User) error {
+	isExist, err := u.IsExistByUsername(user.Username)
+	if err != nil {
+		return err
+	}
+	if isExist {
+		return errors.New(fmt.Sprintf(`[%s] 用户名已存在！请重新创建用户！`, user.Username))
+	}
+	return u.userRepo.Create(user)
 }
 
 func (u *UserService) Update(user *model.User) error {
@@ -42,4 +52,8 @@ func (u *UserService) Update(user *model.User) error {
 
 func (u *UserService) FindByUsername(username string) (*model.User, error) {
 	return u.userRepo.FindByUsername(username)
+}
+
+func (u *UserService) Delete(user *model.User) error {
+	return u.userRepo.Delete(user)
 }

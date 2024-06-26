@@ -1,6 +1,6 @@
-// 通用 用户名校验
 import {isExistUserName} from "../../src/components/app/admin/user/user.service.ts";
 
+// 通用 用户名校验
 export const validateUserName = async (_: any, validate_user_name: string) => {
 
     const nameRegex = /^[A-Za-z][A-Za-z0-9]*$/; // 必须以英文字母开头，可以包含数字，但不能全是数字
@@ -14,7 +14,6 @@ export const validateUserName = async (_: any, validate_user_name: string) => {
         return Promise.reject(new Error('用户名不能小于三个字符!'));
     }
     const response = await isExistUserName({username: validate_user_name});
-    console.log(response)
     if (response) {
         return Promise.reject(new Error('用户名已存在，请选择其他用户名！'));
     } else {
@@ -54,6 +53,15 @@ export const validateName = (_: any, validate_name: string) => {
     }
     if (!nameRegex.test(validate_name)) {
         return Promise.reject(new Error('姓名必须是2到4个汉字!'));
+    }
+    return Promise.resolve();
+};
+
+// 通用 邮箱校验
+export const validateEmail = (_: any, validate_email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 简单的邮箱正则表达式
+    if (!emailRegex.test(validate_email)) {
+        return Promise.reject(new Error('邮箱格式有误!'));
     }
     return Promise.resolve();
 };

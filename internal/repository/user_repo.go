@@ -10,7 +10,7 @@ type IUserRepo interface {
 	IsExistByUsername(username string) (bool, error)
 	GetUserList(*response.Page) error
 	FindByUsername(name string) (*model.User, error)
-	Save(*model.User) error
+	Create(*model.User) error
 	Delete(*model.User) error
 	Update(*model.User) error
 }
@@ -27,7 +27,6 @@ func (u *UserRepo) IsExistByUsername(username string) (bool, error) {
 	var count int64
 	u.db.Where("username = ?", username).First(&model.User{}).Count(&count)
 	return count > 0, nil
-	//return errors.Is(u.db.Error, gorm.ErrRecordNotFound), nil
 }
 
 func (u *UserRepo) GetUserList(page *response.Page) error {
@@ -55,7 +54,7 @@ func (u *UserRepo) FindByUsername(name string) (*model.User, error) {
 	return user, nil
 }
 
-func (u *UserRepo) Save(user *model.User) error {
+func (u *UserRepo) Create(user *model.User) error {
 	return u.db.Create(user).Error
 }
 

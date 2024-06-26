@@ -25,10 +25,11 @@ var _ ginfx.Handler = (*UserHandler)(nil)
 
 func (u *UserHandler) Routes() []ginfx.Route {
 	return []ginfx.Route{
-		u.IsExistByUsername(),
+		u.isExistByUsername(),
 		u.getUserList(),
 		u.addUser(),
-		u.UpdateUser(),
+		u.updateUser(),
+		u.deleteUser(),
 	}
 }
 
@@ -41,7 +42,7 @@ func (u *UserHandler) Routes() []ginfx.Route {
 // @Success      200  {object}  boolean 是否存在
 // @Failure      400  {object}  string 报错信息
 // @Router       /api/user/is_exist_username [get]
-func (u *UserHandler) IsExistByUsername() ginfx.Route {
+func (u *UserHandler) isExistByUsername() ginfx.Route {
 	return func() (method string, pattern string, handler gin.HandlerFunc) {
 		return "GET", "/api/user/is_exist_username", func(ctx *gin.Context) {
 			username := ctx.Query("username")
@@ -102,7 +103,7 @@ func (u *UserHandler) addUser() ginfx.Route {
 				ctx.JSON(http.StatusBadRequest, "用户创建失败！请联系系统管理员！")
 				return
 			}
-			err = u.userService.Save(&user)
+			err = u.userService.Create(&user)
 			if err != nil {
 				logger.Error(err)
 				ctx.JSON(http.StatusBadRequest, "用户创建失败！请联系系统管理员!")
@@ -122,7 +123,7 @@ func (u *UserHandler) addUser() ginfx.Route {
 // @Success      200  {object}  string "ok"
 // @Failure      400  {object}  string 报错信息
 // @Router       /api/user/update [post]
-func (u *UserHandler) UpdateUser() ginfx.Route {
+func (u *UserHandler) updateUser() ginfx.Route {
 	return func() (method string, pattern string, handler gin.HandlerFunc) {
 		return "POST", "/api/user/update", func(ctx *gin.Context) {
 			var user model.User
@@ -139,6 +140,30 @@ func (u *UserHandler) UpdateUser() ginfx.Route {
 				return
 			}
 			ctx.JSON(http.StatusOK, "用户保存成功！")
+		}
+	}
+}
+
+// @Summary      删除用户
+// @Description
+// @Tags         用户管理
+// @Produce      json
+// @Param        user.id  {object}  string  true  "UserId"
+// @Success      200  {object}  string "ok"
+// @Failure      400  {object}  string 报错信息
+// @Router       /api/user/delete [get]
+func (u *UserHandler) deleteUser() ginfx.Route {
+	return func() (method string, pattern string, handler gin.HandlerFunc) {
+		return "GET", "/api/user/delete", func(ctx *gin.Context) {
+			var user model.User
+			user.Id, _ = strconv.ParseInt(ctx.Query("id"), 0, 64)
+			err := u.userService.Delete(&user)
+			if err != nil {
+				logger.Error(err)
+				ctx.JSON(http.StatusBadRequest, "用户删除失败！请联系系统管理员!")
+				return
+			}
+			ctx.JSON(http.StatusOK, "用户删除成功！")
 		}
 	}
 }

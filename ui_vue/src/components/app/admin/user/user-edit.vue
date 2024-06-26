@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {defineEmits, defineProps, reactive, ref, UnwrapRef, watch} from 'vue';
+import {defineEmits, defineProps, onMounted, reactive, ref, UnwrapRef, watch} from 'vue';
 import {LockOutlined, MailOutlined, PhoneOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons-vue';
 import {
   validateEmail,
@@ -14,11 +14,15 @@ import {addUser} from "./user.service.ts";
 import {message} from "ant-design-vue";
 
 // model 传值 func
-const isOpened = defineProps({
+const editModel = defineProps({
   isOpened: {
     type: Boolean,
     required: true
-  }
+  },
+  user: {
+    type: User,
+    required: true
+  },
 })
 const emit = defineEmits(['handleIsOpenedChange'])
 
@@ -36,7 +40,7 @@ const handleOk = () => {
             confirmLoading.value = false;
             formRef.value.resetFields();
             formRef.value.clearValidate();
-            message.success('添加成功！');
+            message.info('添加成功！');
             emit('handleIsOpenedChange', {isOpened: false, submitStatus: true});
           } catch (err) {
             confirmLoading.value = false;
@@ -58,6 +62,7 @@ const handleCancel = () => {
 // form表单绑定数据
 const formRef = ref();
 const formState: UnwrapRef<User> = reactive({
+  id: -1,
   name: '',
   username: '',
   phone: '',
@@ -77,6 +82,12 @@ const layout = {
   wrapperCol: {span: 16},
 };
 
+onMounted(() => {
+
+
+  console.log(editModel.user)
+})
+
 const okButtonStatus = () => {
   formRef.value.validateFields()
       .then(() => {
@@ -95,8 +106,8 @@ watch((formState), () => {
 
 <template>
   <div>
-    <a-modal :open="isOpened.isOpened.valueOf()"
-             title="新增用户"
+    <a-modal :open="editModel.isOpened.valueOf()"
+             title="编辑用户"
              :confirm-loading="confirmLoading"
              :ok-button-props="{ disabled: okButtonProps.valueOf() }"
              @ok="handleOk"
