@@ -90,12 +90,15 @@ function selectElement(info: any) {
   <a-config-provider :theme="{token: {borderRadius: 16}, algorithm: usingTheme}">
     <a-layout>
       <!--      :style="{ position: 'fixed', zIndex: 1, width: '100%' }"  固定页头-->
-      <a-layout-header>
+      <a-layout-header :style="{ position: 'fixed', zIndex: 1, width: '100%' }">
         <div class="logo" style="font-family: 'Microsoft YaHei', sans-serif;">JeungNyeongJae</div>
       </a-layout-header>
 
-      <a-layout style="min-height: 100vh">
-        <a-layout-sider v-model:collapsed="collapsed" width="200" collapsible breakpoint="lg">
+      <a-layout style="min-height: 100vh" :style="{ marginTop: '56px' }">
+        <a-layout-sider v-model:collapsed="collapsed"
+                        collapsible breakpoint="lg"
+                        :style="{ overflow: 'auto', height: '100vh', position: 'fixed', left: 0 }"
+                        width="200">
           <a-menu v-model:selectedKeys="selectedKeys" :style="{height: '100%', borderRight: 0 }" mode="inline">
             <a-menu-item key="1">
               <pie-chart-outlined/>
@@ -133,7 +136,7 @@ function selectElement(info: any) {
           </a-menu>
         </a-layout-sider>
 
-        <a-layout style="padding: 0 24px 24px">
+        <a-layout :style="{ marginLeft: '180px', padding: '0 24px 24px' }">
           <a-breadcrumb style="margin: 16px 0">
             <a-breadcrumb-item>{{ selectedKeys[0] }}</a-breadcrumb-item>
             <a-breadcrumb-item>{{ selectedKeys[0] }}</a-breadcrumb-item>
