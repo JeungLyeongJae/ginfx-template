@@ -57,20 +57,27 @@ const isEnabled = (id: number) => {
 }
 
 // 删除用户
+const isDeleted = ref<Boolean>(false);
 const deletedUser = (id: number) => {
   return new Promise<void>((resolve) => {
     setTimeout(async () => {
       try {
-        await deleteUser({id: id})
+        await deleteUser({id: id});
         message.success('删除成功！');
+        isDeleted.value = true
       } catch (err) {
         message.error('删除失败！');
       }
-    }, 1000);
-    fetchUsers();
-    resolve();
-  });
+      resolve(); // 确保在删除操作完成后调用 resolve
+    }, 500);
+  })
 }
+const handleVisibleChange = (bool: boolean) => {
+  if (!bool && isDeleted.value) {
+    fetchUsers()
+    isDeleted.value = false
+  }
+};
 
 // user table
 const userTable = reactive({
@@ -231,7 +238,11 @@ const handleTableChange = (p: PaginationType) => {
             |
           </span>
           <span style="margin-left: 3px">
-            <a-popconfirm title="确定要删除?" @confirm="deletedUser(record.id)" ok-text="确定" cancel-text="取消">
+            <a-popconfirm title="确定要删除?"
+                          @confirm="deletedUser(record.id)"
+                          ok-text="确定"
+                          cancel-text="取消"
+                          @openChange="handleVisibleChange">
               <a>删除</a>
             </a-popconfirm>
           </span>

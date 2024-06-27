@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {defineEmits, defineProps, onMounted, reactive, ref, UnwrapRef, watch} from 'vue';
+import {defineEmits, defineProps, PropType, reactive, ref, UnwrapRef, watch} from 'vue';
 import {LockOutlined, MailOutlined, PhoneOutlined, TeamOutlined, UserOutlined} from '@ant-design/icons-vue';
 import {
   validateEmail,
@@ -10,7 +10,7 @@ import {
 } from "../../../../../public/model/validator.ts";
 import {User} from "./user.ts";
 import {Rule} from "ant-design-vue/es/form";
-import {addUser} from "./user.service.ts";
+import {updateUser} from "./user.service.ts";
 import {message} from "ant-design-vue";
 
 // model 传值 func
@@ -20,7 +20,7 @@ const editModel = defineProps({
     required: true
   },
   user: {
-    type: User,
+    type: Object as PropType<User>,
     required: true
   },
 })
@@ -36,15 +36,15 @@ const handleOk = () => {
         okButtonProps.value = true;
         setTimeout(async () => {
           try {
-            await addUser(formState);
+            await updateUser(formState);
             confirmLoading.value = false;
             formRef.value.resetFields();
             formRef.value.clearValidate();
-            message.info('添加成功！');
+            message.info('修改成功！');
             emit('handleIsOpenedChange', {isOpened: false, submitStatus: true});
           } catch (err) {
             confirmLoading.value = false;
-            message.error('添加失败！请重试');
+            message.error('修改失败！请重试');
           }
         }, 1000)
       })
@@ -82,26 +82,38 @@ const layout = {
   wrapperCol: {span: 16},
 };
 
-onMounted(() => {
-
-
-  console.log(editModel.user)
-})
+watch(
+    () => editModel.user,
+    (newUser) => {
+      if (newUser) {
+        formState.id = newUser.id;
+        formState.name = newUser.name;
+        formState.username = newUser.username;
+        formState.phone = newUser.phone;
+        formState.password = newUser.password;
+        formState.email = newUser.email;
+        formState.enable = newUser.enable;
+      }
+    },
+    {immediate: true}
+);
 
 const okButtonStatus = () => {
-  formRef.value.validateFields()
-      .then(() => {
-        okButtonProps.value = false;
-      })
-      .catch(() => {
-        okButtonProps.value = true;
-      });
+  if (formRef.value) {
+    formRef.value.validateFields()
+        .then(() => {
+          okButtonProps.value = false;
+        })
+        .catch(() => {
+          okButtonProps.value = true;
+        });
+  }
 }
 watch((formState), () => {
   if (Object.values(formState).every(value => value !== '')) {
     okButtonStatus();
   }
-}, { deep: true });
+}, {deep: true});
 </script>
 
 <template>
