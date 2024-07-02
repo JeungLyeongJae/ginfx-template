@@ -60,7 +60,7 @@ export const validateName = (_: any, validate_name: string) => {
 // 通用 邮箱校验
 export const validateEmail = (_: any, validate_email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // 简单的邮箱正则表达式
-    if (!emailRegex.test(validate_email)) {
+    if (validate_email && !emailRegex.test(validate_email)) {
         return Promise.reject(new Error('邮箱格式有误!'));
     }
     return Promise.resolve();

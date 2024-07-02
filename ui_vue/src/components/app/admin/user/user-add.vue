@@ -12,6 +12,7 @@ import {User} from "./user.ts";
 import {Rule} from "ant-design-vue/es/form";
 import {addUser} from "./user.service.ts";
 import {message} from "ant-design-vue";
+import {keys} from "lodash-es";
 
 // model 传值 func
 const isOpened = defineProps({
@@ -87,7 +88,7 @@ const okButtonStatus = () => {
       });
 }
 watch((formState), () => {
-  if (Object.values(formState).every(value => value !== '')) {
+  if (Object.values(formState).slice(0, 4).every(value => value !== '')) {
     okButtonStatus();
   }
 }, { deep: true });

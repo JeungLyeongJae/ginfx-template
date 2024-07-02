@@ -34,11 +34,11 @@ func (u *UserHandler) Routes() []ginfx.Route {
 }
 
 // IsExistByUsername
-// @Summary      用户列表
+// @Summary      查询是否重名
 // @Description
 // @Tags         用户管理
 // @Produce      json
-// @Param        username {object} string true  "查询用户名"
+// @Param        username query string true  "查询用户名"
 // @Success      200  {object}  boolean 是否存在
 // @Failure      400  {object}  string 报错信息
 // @Router       /api/user/is_exist_username [get]
@@ -148,7 +148,7 @@ func (u *UserHandler) updateUser() ginfx.Route {
 // @Description
 // @Tags         用户管理
 // @Produce      json
-// @Param        user.id  {object}  string  true  "UserId"
+// @Param        id query string  true  "UserId"
 // @Success      200  {object}  string "ok"
 // @Failure      400  {object}  string 报错信息
 // @Router       /api/user/delete [get]
