@@ -63,7 +63,7 @@ func (u *UserRepo) Delete(user *model.User) error {
 }
 
 func (u *UserRepo) Update(user *model.User) error {
-	return u.db.Model(user).Updates(user).Error
+	return u.db.Model(user).Select("*").Updates(user).Error
 }
 
 var _ IUserRepo = (*UserRepo)(nil)
