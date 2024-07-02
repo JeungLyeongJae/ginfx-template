@@ -6,6 +6,8 @@ definitions:
         type: string
       deleted_at:
         type: string
+      email:
+        type: string
       enable:
         type: boolean
       id:
@@ -28,6 +30,21 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  response.Page:
+    properties:
+      condition:
+        type: string
+      page_number:
+        type: integer
+      page_size:
+        type: integer
+      total_count:
+        type: integer
+      users:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
     type: object
 host: localhost:9060
 info:
@@ -63,6 +80,96 @@ paths:
           schema:
             type: string
       summary: 新增用户
+      tags:
+      - 用户管理
+  /api/user/delete:
+    get:
+      parameters:
+      - description: UserId
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: 删除用户
+      tags:
+      - 用户管理
+  /api/user/is_exist_username:
+    get:
+      parameters:
+      - description: 查询用户名
+        in: query
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: 查询是否重名
+      tags:
+      - 用户管理
+  /api/user/list:
+    get:
+      parameters:
+      - description: 分页信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/response.Page'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: body
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: 用户列表
+      tags:
+      - 用户管理
+  /api/user/update:
+    post:
+      parameters:
+      - description: User信息
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: 编辑用户
       tags:
       - 用户管理
 securityDefinitions:
