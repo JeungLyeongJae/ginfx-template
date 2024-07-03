@@ -12,6 +12,7 @@ import {
   UserOutlined
 } from '@ant-design/icons-vue';
 import User from "./admin/user/user.vue";
+import LoginPage from "./admin/auth/login-page.vue";
 
 const collapsed = ref<boolean>(false);
 const selectedKeys = ref<string[]>(['1']);
@@ -126,6 +127,9 @@ function selectElement(info: any) {
           </a-breadcrumb>
 
           <a-layout-content>
+            <div class="box" v-if="selectedKeys[0] === '1'">
+              <login-page />
+            </div>
             <div class="box" id="bpmn" v-if="selectedKeys[0] === 'bpmn'">
               <Bpmn-Vue :bpmnID="'test'" ref="bpmnRef" @select:element="selectElement"/>
             </div>

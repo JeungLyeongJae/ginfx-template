@@ -5,6 +5,7 @@ import (
 	"ginfx-template/config"
 	"ginfx-template/pkg/auth/domain"
 	"ginfx-template/pkg/auth/services"
+	"ginfx-template/pkg/common"
 	"log"
 	"log/slog"
 	"time"
@@ -58,7 +59,7 @@ func NewGinJWTMiddleware(config *config.AppConfig, userService services.UserDeta
 				return nil, errors.New("登录失败")
 			}
 
-			if Encoder.Matches(loginRequest.Password, userDetails.GetPassword()) {
+			if common.Encoder.Matches(loginRequest.Password, userDetails.GetPassword()) {
 				return userDetails, nil
 			}
 			return nil, errors.New("登录失败")

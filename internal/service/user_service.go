@@ -6,6 +6,7 @@ import (
 	"ginfx-template/internal/model"
 	"ginfx-template/internal/model/response"
 	"ginfx-template/internal/repository"
+	"ginfx-template/pkg/common"
 )
 
 type IUserService interface {
@@ -22,7 +23,9 @@ type UserService struct {
 }
 
 func NewUserService(userRepo repository.IUserRepo) IUserService {
-	return &UserService{userRepo: userRepo}
+	return &UserService{
+		userRepo: userRepo,
+	}
 }
 
 var _ IUserService = (*UserService)(nil)
@@ -43,10 +46,19 @@ func (u *UserService) Create(user *model.User) error {
 	if isExist {
 		return errors.New(fmt.Sprintf(`[%s] 用户名已存在！请重新创建用户！`, user.Username))
 	}
+	user.PlainPassword, err = common.Encoder.Encode(user.Password)
+	if err != nil {
+		return err
+	}
 	return u.userRepo.Create(user)
 }
 
 func (u *UserService) Update(user *model.User) error {
+	encode, err := common.Encoder.Encode(user.Password)
+	if err != nil {
+		return err
+	}
+	user.PlainPassword = encode
 	return u.userRepo.Update(user)
 }
 
