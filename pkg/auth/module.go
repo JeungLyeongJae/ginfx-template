@@ -4,6 +4,7 @@ import (
 	"ginfx-template/pkg/auth/handlers"
 	"ginfx-template/pkg/auth/provide"
 	"ginfx-template/pkg/auth/services"
+	"ginfx-template/pkg/fx/ginfx"
 	"go.uber.org/fx"
 )
 
@@ -17,6 +18,6 @@ var Module = fx.Module("AuthModule",
 		provide.NewAuthorizer,
 	),
 	fx.Provide(
-		handlers.NewAuthHandler,
+		ginfx.AsHandler(handlers.NewAuthHandler),
 	),
 )

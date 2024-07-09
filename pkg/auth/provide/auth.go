@@ -2,7 +2,6 @@ package provide
 
 import (
 	"errors"
-	"ginfx-template/config"
 	"ginfx-template/pkg/auth/domain"
 	"ginfx-template/pkg/auth/services"
 	"ginfx-template/pkg/common"
@@ -18,12 +17,11 @@ const (
 	identityKey = "sub"
 )
 
-func NewGinJWTMiddleware(config *config.AppConfig, userService services.UserDetailsService) *jwt.GinJWTMiddleware {
+func NewGinJWTMiddleware(userService services.UserDetailsService) *jwt.GinJWTMiddleware {
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:            "model-builder",
-		SigningAlgorithm: "RS256",
-		PubKeyBytes:      []byte(config.JwtConfig.PublicKey),
-		PrivKeyBytes:     []byte(config.JwtConfig.PrivateKey),
+		SigningAlgorithm: "HS256",
+		Key:              []byte("gin fx template"), //密钥
 		Timeout:          time.Hour,
 		MaxRefresh:       time.Hour,
 		IdentityKey:      identityKey,

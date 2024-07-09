@@ -10,7 +10,7 @@ export interface UserPagination {
 }
 
 const apiClient = axios.create({
-    baseURL: 'http://10.18.16.33:9060', // 替换为你的 API 基础 URL
+    baseURL: 'http://localhost:9060', // 替换为你的 API 基础 URL
     headers: {
         'Content-Type': 'application/json',
     },

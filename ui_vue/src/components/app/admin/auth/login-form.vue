@@ -28,7 +28,10 @@
 <script lang="ts" setup>
 import {reactive} from 'vue';
 import {message} from 'ant-design-vue';
-import {authLoginApi, login} from "./auth.service.ts";
+import {login} from "./auth.service.ts";
+import {useRouter} from "vue-router";
+
+const router = useRouter();
 
 const form = reactive({
   username: '',
@@ -43,10 +46,16 @@ const handleSubmit = (e: any) => {
   } else {
     setTimeout(async () => {
       try {
-        await authLoginApi({username: form.username, password: form.password});
+        const data = await login({username: form.username, password: form.password});
         message.success('Login successful！');
+
+        // 将 token 存储在 localStorage 中，用于后续的身份验证
+        sessionStorage.setItem('token', data.token);
+
+        // 使用 Vue Router 的 router.push() 方法进行页面跳转
+        await router.push('home'); // 跳转到名为 home 的路由
       } catch (err) {
-        message.error('添加失败！请重试');
+        message.error('Login defeated');
       }
     }, 1000)
   }

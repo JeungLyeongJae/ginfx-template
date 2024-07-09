@@ -3,9 +3,11 @@ server:
   port: 9060
 jwt:
   realm: demo
+  privateKey:
+  publicKey:
 database:
   host: 127.0.0.1
-  port: 3316
+  port: 3306
   dbname: ginfx-template
   username: root
   password: root#123

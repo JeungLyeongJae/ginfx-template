@@ -29,7 +29,7 @@ func (m *DbUserDetailsService) LoadUserByUsername(username string) (domain.UserD
 	return &domain.User{
 		Name:                  u.Name,
 		Username:              u.Username,
-		Password:              u.Password,
+		Password:              u.PlainPassword,
 		Authorities:           u.Roles,
 		AccountNonExpired:     true,
 		AccountNonLocked:      true,
