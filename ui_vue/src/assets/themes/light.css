@@ -1,7 +1,0 @@
-/** 通过:root声明全局变量*/
-:root{
-    --color: #ffff;
-    --BgColor: #ffffff
-
-}
-/** 在对应的layout的style里面引入，例如：home{background-color:var(--BgColor)}*/

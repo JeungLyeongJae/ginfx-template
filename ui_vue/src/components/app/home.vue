@@ -12,7 +12,6 @@ import {
   UserOutlined
 } from '@ant-design/icons-vue';
 import User from "./admin/user/user.vue";
-import LoginPage from "./admin/auth/login-page.vue";
 
 const collapsed = ref<boolean>(false);
 const selectedKeys = ref<string[]>(['1']);
@@ -60,10 +59,6 @@ const toggleTheme = () => {
   }
   sessionStorage.setItem('toggleThemeButtonType', toggleThemeButtonType.value)
 };
-
-function selectElement(info: any) {
-  console.log(info);
-}
 </script>
 
 <template>
@@ -127,9 +122,6 @@ function selectElement(info: any) {
           </a-breadcrumb>
 
           <a-layout-content>
-            <div class="box" id="bpmn" v-if="selectedKeys[0] === 'bpmn'">
-              <Bpmn-Vue :bpmnID="'test'" ref="bpmnRef" @select:element="selectElement"/>
-            </div>
             <div class="box" id="role_list" v-if="selectedKeys[0] === '人员信息'">
               <user/>
             </div>
@@ -230,7 +222,7 @@ function selectElement(info: any) {
   border-radius: 10px;
   padding: 5px;
   font-size: 13px;
-  font-family: "MV Boli",sans-serif;
+  font-family: "MV Boli", sans-serif;
 }
 
 .box {
