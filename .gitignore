@@ -27,3 +27,4 @@ go.sum
 
 package-lock.json
 yarn.lock
+version.txt

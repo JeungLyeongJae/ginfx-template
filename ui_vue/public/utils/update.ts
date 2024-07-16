@@ -78,6 +78,10 @@ const openNotification = () => {
             '系统已更新，请手动刷新页面（请在刷新前注意保存当前页面数据）。',
         icon: () => h(SmileOutlined, { style: 'color: #108ee9' }),
         duration: 0,
+        style: {
+            width: '600px',
+            marginLeft: `${335 - 600}px`,
+        },
         btn: () =>
             h(
                 Button,
