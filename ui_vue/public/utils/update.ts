@@ -88,6 +88,7 @@ const openNotification = () => {
                 {
                     type: 'primary',
                     size: 'small',
+                    style: 'border-radius: 16px',
                     onClick: () => refresh(key),
                 },
                 { default: () => '刷新' },
