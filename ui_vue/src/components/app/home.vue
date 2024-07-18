@@ -9,9 +9,12 @@ import {
   PieChartOutlined,
   TeamOutlined,
   ToolOutlined,
-  UserOutlined
+  UserOutlined,
+  SkinOutlined
 } from '@ant-design/icons-vue';
 import User from "./admin/user/user.vue";
+import enUS from 'ant-design-vue/es/locale/en_US';
+import zhCN from 'ant-design-vue/es/locale/zh_CN';
 
 const collapsed = ref<boolean>(false);
 const selectedKeys = ref<string[]>(['1']);
@@ -59,10 +62,21 @@ const toggleTheme = () => {
   }
   sessionStorage.setItem('toggleThemeButtonType', toggleThemeButtonType.value)
 };
+
+const customToken = ref({
+  "borderRadius": 16,
+  "borderRadiusSM": 16,
+  "borderRadiusXS": 16,
+  "wireframe": false,
+  "fontSize": 14,
+  "colorPrimary": "#440dff",
+  "colorInfo": "#440dff"
+})
+
 </script>
 
 <template>
-  <a-config-provider :theme="{token: {borderRadius: 16}, algorithm: usingTheme}">
+  <a-config-provider :locale="zhCN" :theme="{token: customToken, algorithm: usingTheme}" :wave="{disabled: false}">
 
     <a-layout style="min-height: 100vh">
 
@@ -113,7 +127,12 @@ const toggleTheme = () => {
 
       <a-layout class="site-layout" :class="{ collapsed: collapsed }">
 
-        <a-layout-header class="site-layout-header"></a-layout-header>
+        <a-layout-header class="site-layout-header">
+          <div style="width: 100%; text-align: right; margin: 20px">
+            <input type="color" />
+            <a type="color"><SkinOutlined style="font-size: 16px"/></a>
+          </div>
+        </a-layout-header>
 
         <a-layout class="site-layout-content">
           <a-breadcrumb style="margin: 16px">
