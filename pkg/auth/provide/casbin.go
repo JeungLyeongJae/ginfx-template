@@ -22,6 +22,13 @@ type Authorizer struct {
 	enforcer   *casbin.Enforcer
 }
 
+//func (group *AuthRouterGroup) handle(httpMethod, relativePath string, roles []string, handlers gin.HandlersChain) gin.IRoutes {
+//	for _, role := range roles {
+//		_, _ = e.AddNamedPolicy("p", role, group.RouterGroup.BasePath()+relativePath, httpMethod)
+//	}
+//	return group.RouterGroup.Handle(httpMethod, relativePath, handlers...)
+//}
+
 func NewEnforcer() *casbin.Enforcer {
 	m, err := model.NewModelFromString(rbacModel)
 	if err != nil {

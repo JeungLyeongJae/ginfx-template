@@ -1,5 +1,5 @@
-import axios from 'axios';
 import {User} from "./user.ts";
+import apiClient from "../../../../axios.service.ts";
 
 export interface UserPagination {
     page_number?: number;
@@ -9,31 +9,24 @@ export interface UserPagination {
     users?: User[];
 }
 
-const apiClient = axios.create({
-    baseURL: 'http://localhost:9060', // 替换为你的 API 基础 URL
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
 // 判断用户名重复
 export const isExistUserName = async (params: { username: string }): Promise<boolean> => {
-    return (await apiClient.get<boolean>('/api/user/is_exist_username', { params })).data;
+    return (await apiClient.get<boolean>('/api/user/is_exist_username', {params})).data;
 };
 
 // 获取用户列表
 export const getUsers = async (params: UserPagination): Promise<UserPagination> => {
-    return (await apiClient.get<UserPagination>('/api/user/list', { params })).data;
+    return (await apiClient.get<UserPagination>('/api/user/list', {params})).data;
 };
 
 // 新增用户
 export const addUser = async (params: User) => {
-    return (await apiClient.post<User>('/api/user/add',  params));
+    return (await apiClient.post<User>('/api/user/add', params));
 };
 
 // 编辑用户
 export const updateUser = async (params: User) => {
-    return (await apiClient.post<void>('/api/user/update',  params));
+    return (await apiClient.post<void>('/api/user/update', params));
 };
 
 // 删除用户

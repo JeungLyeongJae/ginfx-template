@@ -87,7 +87,12 @@ const customToken = ref({
                       width="200"
                       theme="light"
                       class="layout-slider">
-        <div class="logo">JeungNyeongJae</div>
+        <div class="logo">
+          <transition name="fade">
+            <span v-if="collapsed" class="logo-text">J</span>
+            <span v-else class="logo-text">JeungNyeongJae</span>
+          </transition>
+        </div>
         <a-menu v-model:selectedKeys="selectedKeys" :style="{height: '100%', borderRight: 0 }" mode="inline">
           <a-menu-item key="1">
             <pie-chart-outlined/>
@@ -234,14 +239,24 @@ const customToken = ref({
 
 .logo {
   align-items: center;
-  display: flex;
   width: 120px;
   height: 40px;
-  margin: 15px 5px 5px 40px;
-  border-radius: 10px;
+  margin: 15px 5px 5px 30px;
   padding: 5px;
   font-size: 13px;
   font-family: "MV Boli", sans-serif;
+}
+
+.logo-text {
+  position: absolute;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s ease-in-out;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 
 .box {

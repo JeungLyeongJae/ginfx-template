@@ -7,10 +7,18 @@ import (
 
 type UserDetailsService interface {
 	LoadUserByUsername(username string) (domain.UserDetails, error)
+	UpdateLastLogin(username string) error
 }
 
 type DbUserDetailsService struct {
 	service.IUserService
+}
+
+func (m *DbUserDetailsService) UpdateLastLogin(username string) error {
+	if err := m.UpdateLastLoginTime(username); err != nil {
+		return err
+	}
+	return nil
 }
 
 var _ UserDetailsService = (*DbUserDetailsService)(nil)

@@ -19,7 +19,7 @@ var Module = fx.Module("App",
 		fx.Provide(service.NewUserService),
 	),
 	fx.Options(
-		fx.Provide(ginfx.AsHandler(handler.NewUserHandler)),
+		fx.Provide(ginfx.AsAuthHandler(handler.NewUserHandler)),
 		fx.Provide(ginfx.AsHandler(handler.NewSwaggerHandler)),
 	),
 	fx.Invoke(AutoMigration),

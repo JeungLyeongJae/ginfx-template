@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type UserDetails interface {
 	GetAuthorities() []string
 	GetPassword() string
@@ -9,6 +11,7 @@ type UserDetails interface {
 	IsAccountNonLocked() bool
 	IsCredentialsNonExpired() bool
 	IsEnabled() bool
+	GetLastLogin() time.Time
 }
 
 type User struct {
@@ -20,6 +23,7 @@ type User struct {
 	AccountNonLocked      bool
 	CredentialsNonExpired bool
 	Enabled               bool
+	LastLogin             time.Time
 }
 
 var _ UserDetails = (*User)(nil)
@@ -54,4 +58,8 @@ func (u *User) IsCredentialsNonExpired() bool {
 
 func (u *User) IsEnabled() bool {
 	return u.Enabled
+}
+
+func (u *User) GetLastLogin() time.Time {
+	return u.LastLogin
 }

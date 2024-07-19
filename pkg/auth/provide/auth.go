@@ -32,6 +32,7 @@ func NewGinJWTMiddleware(userService services.UserDetailsService) *jwt.GinJWTMid
 					identityKey:   v.GetUsername(),
 					"name":        v.GetName(),
 					"authorities": v.GetAuthorities(),
+					"last_login":  v.GetLastLogin().Format(time.RFC3339),
 				}
 			}
 			return jwt.MapClaims{}
@@ -58,6 +59,10 @@ func NewGinJWTMiddleware(userService services.UserDetailsService) *jwt.GinJWTMid
 			}
 
 			if common.Encoder.Matches(loginRequest.Password, userDetails.GetPassword()) {
+				err := userService.UpdateLastLogin(loginRequest.Username)
+				if err != nil {
+					return nil, err
+				} // 更新最后登录时间
 				return userDetails, nil
 			}
 			return nil, errors.New("登录失败")
@@ -87,7 +92,7 @@ func NewGinJWTMiddleware(userService services.UserDetailsService) *jwt.GinJWTMid
 func GetUserName(c *gin.Context) string {
 	u, exist := c.Get(identityKey)
 	if exist {
-		return u.(domain.User).Username
+		return u.(*domain.User).Username
 	}
 	return ""
 }

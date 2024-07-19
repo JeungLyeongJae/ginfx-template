@@ -4,6 +4,7 @@ import (
 	"ginfx-template/internal/model"
 	"ginfx-template/internal/model/response"
 	"gorm.io/gorm"
+	"time"
 )
 
 type IUserRepo interface {
@@ -13,6 +14,7 @@ type IUserRepo interface {
 	Create(*model.User) error
 	Delete(*model.User) error
 	Update(*model.User) error
+	UpdateLastLogin(username string) error
 }
 
 type UserRepo struct {
@@ -64,6 +66,12 @@ func (u *UserRepo) Delete(user *model.User) error {
 
 func (u *UserRepo) Update(user *model.User) error {
 	return u.db.Model(user).Select("*").Omit("created_at").Updates(user).Error
+}
+
+func (u *UserRepo) UpdateLastLogin(username string) error {
+	// skip Hooks methods and don’t track the update time when updating,
+	// use UpdateColumn, UpdateColumns, it works like Update, Updates
+	return u.db.Model(&model.User{}).Where("username = ?", username).UpdateColumn("last_login", time.Now()).Error
 }
 
 var _ IUserRepo = (*UserRepo)(nil)

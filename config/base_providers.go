@@ -3,9 +3,11 @@ package config
 import (
 	"context"
 	"fmt"
+	"ginfx-template/pkg/auth/provide"
 	"ginfx-template/pkg/fx/ginfx"
 	"ginfx-template/pkg/logger"
 	"ginfx-template/pkg/middlewares"
+	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/fx"
@@ -18,7 +20,7 @@ import (
 	"strings"
 )
 
-func ProvideWeb(lc fx.Lifecycle, handlers ginfx.Handlers, appConfig *AppConfig) *gin.Engine {
+func ProvideWeb(lc fx.Lifecycle, handlers ginfx.Handlers, appConfig *AppConfig, jwt *jwt.GinJWTMiddleware, authorizer *provide.Authorizer) *gin.Engine {
 	if strings.ToLower(appConfig.ServerConfig.Mode) == "prod" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -51,6 +53,14 @@ func ProvideWeb(lc fx.Lifecycle, handlers ginfx.Handlers, appConfig *AppConfig) 
 			app.Handle(route())
 		}
 	}
+	for _, handler := range handlers.AuthHandlers {
+		for _, route := range handler.Routes() {
+			//app.Use(jwt.MiddlewareFunc(), authorizer.MiddlewareFunc())
+			app.Use(jwt.MiddlewareFunc())
+			app.Handle(route())
+		}
+	}
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", appConfig.ServerConfig.Port),
 		Handler: app,

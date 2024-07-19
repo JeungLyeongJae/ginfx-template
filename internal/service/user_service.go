@@ -16,6 +16,7 @@ type IUserService interface {
 	Update(user *model.User) error
 	FindByUsername(username string) (*model.User, error)
 	Delete(user *model.User) error
+	UpdateLastLoginTime(username string) error
 }
 
 type UserService struct {
@@ -68,4 +69,8 @@ func (u *UserService) FindByUsername(username string) (*model.User, error) {
 
 func (u *UserService) Delete(user *model.User) error {
 	return u.userRepo.Delete(user)
+}
+
+func (u *UserService) UpdateLastLoginTime(username string) error {
+	return u.userRepo.UpdateLastLogin(username)
 }
