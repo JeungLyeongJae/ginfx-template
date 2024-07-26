@@ -69,8 +69,8 @@ const customToken = ref({
   "borderRadiusXS": 16,
   "wireframe": false,
   "fontSize": 14,
-  "colorPrimary": "#440dff",
-  "colorInfo": "#440dff"
+  "colorPrimary": "#1677ff",
+  "colorInfo": "#1677ff"
 })
 
 </script>
@@ -93,7 +93,7 @@ const customToken = ref({
             <span v-else class="logo-text">JeungNyeongJae</span>
           </transition>
         </div>
-        <a-menu v-model:selectedKeys="selectedKeys" :style="{height: '100%', borderRight: 0 }" mode="inline">
+        <a-menu v-model:selectedKeys="selectedKeys" :style="{height: '100%', borderRight: 0, overflowY: 'auto', scrollbarWidth: 'none' }" mode="inline">
           <a-menu-item key="1">
             <pie-chart-outlined/>
             <span>Option 1</span>
@@ -241,7 +241,7 @@ const customToken = ref({
   align-items: center;
   width: 120px;
   height: 40px;
-  margin: 15px 5px 5px 30px;
+  margin: 20px 5px 5px 30px;
   padding: 5px;
   font-size: 13px;
   font-family: "MV Boli", sans-serif;

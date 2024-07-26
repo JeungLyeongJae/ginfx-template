@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {message} from "ant-design-vue";
+import {JwtHelper} from "./components/app/admin/auth/auth.jwt.ts";
 
 const apiClient = axios.create({
     baseURL: 'http://127.0.0.1:9060',
@@ -9,11 +10,26 @@ const apiClient = axios.create({
     timeout: 5000, // 请求超时时间
 });
 
+export const refreshToken = async (token: string) => {
+    //
+    let jwt = new JwtHelper()
+    if (jwt.getTokenExpirationDate(token)!.getTime() < Date.now() + 1000 * 60 * 10 && jwt.getTokenExpirationDate(token)!.getTime() > Date.now()) {
+        setTimeout(async () => {
+            try {
+                const data = (await apiClient.get<any>('/refresh_token')).data
+                sessionStorage.setItem('token', data.token);
+            } catch (err) {
+            }
+        }, 1000)
+    }
+};
+
 // 添加请求拦截器
 apiClient.interceptors.request.use(
     config => {
         const token = sessionStorage.getItem('token'); // 从本地存储中获取 token
         if (token) {
+            refreshToken(token).then();
             config.headers.Authorization = `Bearer ${token}`;
         }
         return config;
